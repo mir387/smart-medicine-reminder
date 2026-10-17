@@ -37,7 +37,7 @@ jobs:
       - name: Prepare Capacitor project
         run: |
           npm init -y
-          npm install @capacitor/core @capacitor/android @capacitor/local-notifications
+          npm install @capacitor/core @capacitor/android @capacitor/local-notifications @capacitor/app
           npm install --save-dev @capacitor/cli esbuild
 
           mkdir -p www/assets
