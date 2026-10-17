@@ -6,69 +6,118 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0f766e">
   <title>CareCue — Account</title>
+
   <style>
     * { box-sizing: border-box; }
+
     body {
-      margin: 0; min-height: 100vh; padding: 22px;
-      display: grid; place-items: center;
+      margin: 0;
+      min-height: 100vh;
+      padding: 22px;
+      display: grid;
+      place-items: center;
       font-family: Arial, sans-serif;
       background: linear-gradient(145deg, #f0fdfa, #eff6ff);
       color: #153b38;
     }
+
     .card {
-      width: 100%; max-width: 420px; padding: 28px 22px;
-      border-radius: 24px; background: white;
+      width: 100%;
+      max-width: 420px;
+      padding: 28px 22px;
+      border-radius: 24px;
+      background: white;
       box-shadow: 0 12px 40px #0f766e16;
     }
+
     .logo { font-size: 23px; font-weight: 800; color: #0f766e; }
     h1 { margin: 28px 0 8px; font-size: 28px; }
     .sub { color: #64748b; line-height: 1.5; margin-bottom: 24px; }
-    label { display: block; margin: 16px 0 7px; font-size: 14px; font-weight: 700; }
+
+    label {
+      display: block;
+      margin: 16px 0 7px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
     input {
-      width: 100%; padding: 14px; border: 1px solid #cbd5e1;
-      border-radius: 12px; font-size: 16px; background: white;
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      font-size: 16px;
+      background: white;
     }
+
     input:focus { outline: 2px solid #99f6e4; border-color: #0f766e; }
+
     button {
-      width: 100%; min-height: 48px; padding: 14px; margin-top: 18px;
-      border: 0; border-radius: 12px; background: #0f766e;
-      color: white; font-size: 16px; font-weight: 700; cursor: pointer;
+      width: 100%;
+      min-height: 48px;
+      padding: 14px;
+      margin-top: 18px;
+      border: 0;
+      border-radius: 12px;
+      background: #0f766e;
+      color: white;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
     }
+
     button:disabled { opacity: .6; cursor: wait; }
-    .google { background: white; color: #334155; border: 1px solid #cbd5e1; }
+
+    .google {
+      background: white;
+      color: #334155;
+      border: 1px solid #cbd5e1;
+    }
+
     .google span { color: #4285f4; font-size: 19px; margin-right: 8px; }
-    .switch { text-align: center; font-size: 14px; margin-top: 20px; color: #64748b; }
+
+    .switch {
+      text-align: center;
+      font-size: 14px;
+      margin-top: 20px;
+      color: #64748b;
+    }
+
     .switch a { color: #0f766e; font-weight: 700; cursor: pointer; }
     .message { font-size: 14px; line-height: 1.5; margin-top: 14px; overflow-wrap: anywhere; }
     .note { font-size: 12px; line-height: 1.5; color: #64748b; margin-top: 20px; }
     [hidden] { display: none !important; }
   </style>
 </head>
+
 <body>
   <main class="card">
     <div class="logo">✚ CareCue</div>
+
     <h1 id="heading">Create your account</h1>
-    <p class="sub" id="subtitle">Your medicine schedule, organised in one place.</p>
+    <p class="sub" id="subtitle">
+      Your medicine schedule, organised in one place.
+    </p>
 
     <form id="authForm">
       <div id="nameField">
         <label for="name">Full name *</label>
         <input id="name" name="name" type="text"
-               autocomplete="name" placeholder="Enter your full name" required>
+          autocomplete="name" placeholder="Enter your full name" required>
       </div>
 
       <label for="email">Email address *</label>
-      <input id="email" name="email" type="email" autocomplete="email"
-             placeholder="you@example.com" required>
+      <input id="email" name="email" type="email"
+        autocomplete="email" placeholder="you@example.com" required>
 
       <label for="password">Password *</label>
       <input id="password" name="password" type="password"
-             autocomplete="new-password" minlength="8"
-             placeholder="At least 8 characters" required>
+        autocomplete="new-password" minlength="8"
+        placeholder="At least 8 characters" required>
 
       <label for="phone">Phone number (optional)</label>
       <input id="phone" name="phone" type="tel" inputmode="tel"
-             autocomplete="tel" placeholder="+91 XXXXX XXXXX">
+        autocomplete="tel" placeholder="+91 XXXXX XXXXX">
 
       <button id="submitButton" type="submit">Create account</button>
     </form>
@@ -83,12 +132,25 @@
     </p>
 
     <p class="message" id="message" role="status" aria-live="polite"></p>
+
     <p class="note" id="note">
-      Authentication setup is pending. No account will be created until a real authentication provider is connected.
+      Your account is managed by Supabase. Use a valid email address.
     </p>
   </main>
 
+  <!-- Supabase JavaScript client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <script>
+    // CARECUE SUPABASE CONFIGURATION
+    const SUPABASE_URL =
+      "https://suvrmmuwvxtvghgbtnvs.supabase.co";
+
+    // Paste your Supabase PUBLISHABLE key between these quotes.
+    // Never use a service_role or secret key in this file.
+    const SUPABASE_PUBLISHABLE_KEY =
+      "sb_publishable_WAdWbVJxrp0JKGe0qV06_A_fcPAyjsb";
+
     const form = document.getElementById("authForm");
     const nameField = document.getElementById("nameField");
     const nameInput = document.getElementById("name");
@@ -102,34 +164,125 @@
     const switchMode = document.getElementById("switchMode");
     const googleButton = document.getElementById("googleButton");
     const message = document.getElementById("message");
+    const note = document.getElementById("note");
 
     let isSignup = true;
+    let supabaseClient = null;
 
     function showMessage(text, error = false) {
       message.textContent = text;
       message.style.color = error ? "#b91c1c" : "#0f766e";
     }
 
+    function setBusy(busy) {
+      submitButton.disabled = busy;
+      googleButton.disabled = busy;
+      submitButton.textContent = busy
+        ? "Please wait..."
+        : (isSignup ? "Create account" : "Sign in");
+    }
+
+    function initSupabase() {
+      if (supabaseClient) return supabaseClient;
+
+      if (!window.supabase || !window.supabase.createClient) {
+        throw new Error(
+          "Supabase client did not load. Check your internet connection."
+        );
+      }
+
+      if (
+        !SUPABASE_PUBLISHABLE_KEY ||
+        SUPABASE_PUBLISHABLE_KEY ===
+          "PASTE_YOUR_SUPABASE_PUBLISHABLE_KEY_HERE"
+      ) {
+        throw new Error(
+          "Add your Supabase publishable key in auth.html first."
+        );
+      }
+
+      supabaseClient = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY
+      );
+
+      return supabaseClient;
+    }
+
+    function getHomePath() {
+      // In the current CareCue APK workflow, index.html is
+      // the loading screen and the app home is copied to app.html.
+      return new URL("./app.html", window.location.href).href;
+    }
+
+    async function saveProfile(user) {
+      if (!user) return;
+
+      const metadata = user.user_metadata || {};
+      const fullName =
+        metadata.full_name ||
+        metadata.name ||
+        (user.email ? user.email.split("@")[0] : "CareCue user");
+
+      const phone = metadata.phone || null;
+
+      const { error } = await initSupabase()
+        .from("profiles")
+        .upsert({
+          id: user.id,
+          full_name: fullName,
+          phone: phone
+        });
+
+      if (error) {
+        // Do not block login if profile saving needs later troubleshooting.
+        console.warn("Profile save needs attention:", error.message);
+      }
+    }
+
+    async function finishLogin(user) {
+      await saveProfile(user);
+      window.location.replace(getHomePath());
+    }
+
+    // Switch between Sign Up and Sign In.
     switchMode.addEventListener("click", event => {
       event.preventDefault();
       isSignup = !isSignup;
 
       nameField.hidden = !isSignup;
       nameInput.required = isSignup;
-      heading.textContent = isSignup ? "Create your account" : "Welcome back";
+
+      heading.textContent = isSignup
+        ? "Create your account"
+        : "Welcome back";
+
       subtitle.textContent = isSignup
         ? "Your medicine schedule, organised in one place."
         : "Sign in to continue to CareCue.";
-      submitButton.textContent = isSignup ? "Create account" : "Sign in";
+
+      submitButton.textContent = isSignup
+        ? "Create account"
+        : "Sign in";
+
       switchText.textContent = isSignup
-        ? "Already have an account?" : "New to CareCue?";
-      switchMode.textContent = isSignup ? "Sign in" : "Create account";
-      passwordInput.autocomplete = isSignup ? "new-password" : "current-password";
+        ? "Already have an account?"
+        : "New to CareCue?";
+
+      switchMode.textContent = isSignup
+        ? "Sign in"
+        : "Create account";
+
+      passwordInput.autocomplete = isSignup
+        ? "new-password"
+        : "current-password";
+
       passwordInput.value = "";
       showMessage("");
     });
 
-    form.addEventListener("submit", event => {
+    // Email + password Sign Up / Sign In.
+    form.addEventListener("submit", async event => {
       event.preventDefault();
 
       if (!form.reportValidity()) return;
@@ -140,16 +293,107 @@
         return;
       }
 
-      showMessage(
-        "Authentication is not connected yet. Your details were not saved. Connect Supabase before using Sign Up or Sign In."
-      );
+      setBusy(true);
+      showMessage("");
+
+      try {
+        const client = initSupabase();
+        const email = emailInput.value.trim();
+        const password = passwordInput.value;
+
+        if (isSignup) {
+          const { data, error } = await client.auth.signUp({
+            email,
+            password,
+            options: {
+              data: {
+                full_name: nameInput.value.trim(),
+                phone: phoneInput.value.trim() || null
+              }
+            }
+          });
+
+          if (error) throw error;
+
+          if (data.session && data.user) {
+            await finishLogin(data.user);
+            return;
+          }
+
+          showMessage(
+            "Account request submitted. Check your email for a confirmation link, then return here and sign in."
+          );
+
+          note.textContent =
+            "Email confirmation may be required before you can sign in.";
+        } else {
+          const { data, error } = await client.auth.signInWithPassword({
+            email,
+            password
+          });
+
+          if (error) throw error;
+
+          if (data.user) {
+            await finishLogin(data.user);
+            return;
+          }
+
+          showMessage("Sign-in could not be completed. Please try again.", true);
+        }
+      } catch (error) {
+        showMessage(
+          error.message || "Something went wrong. Please try again.",
+          true
+        );
+      } finally {
+        setBusy(false);
+      }
     });
 
-    googleButton.addEventListener("click", () => {
-      showMessage(
-        "Google authentication is not configured yet. No Google account has been signed in."
-      );
+    // Google OAuth: Google provider must also be configured in Supabase.
+    googleButton.addEventListener("click", async () => {
+      setBusy(true);
+      showMessage("");
+
+      try {
+        const client = initSupabase();
+
+        const { error } = await client.auth.signInWithOAuth({
+          provider: "google",
+          options: {
+            redirectTo: window.location.href
+          }
+        });
+
+        if (error) throw error;
+        // Successful OAuth redirects away to Google's sign-in page.
+      } catch (error) {
+        showMessage(
+          error.message ||
+            "Google sign-in setup is incomplete. Check Supabase provider settings.",
+          true
+        );
+        setBusy(false);
+      }
     });
+
+    // Handle an OAuth return when Supabase restores the session.
+    try {
+      const client = initSupabase();
+
+      client.auth.onAuthStateChange((event, session) => {
+        if (
+          session &&
+          (event === "SIGNED_IN" || event === "INITIAL_SESSION")
+        ) {
+          // Avoid running additional Supabase queries inside this callback.
+          window.location.replace(getHomePath());
+        }
+      });
+    } catch (error) {
+      showMessage(error.message, true);
+    }
   </script>
 </body>
 </html>
