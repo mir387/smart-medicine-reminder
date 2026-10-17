@@ -6,6 +6,7 @@ on:
   push:
     paths:
       - "index.html"
+      - "native-notifications-entry.js"
       - ".github/workflows/android-apk.yml"
 
 permissions:
@@ -33,10 +34,18 @@ jobs:
       - name: Prepare Capacitor project
         run: |
           npm init -y
-          npm install @capacitor/core @capacitor/android
-          npm install --save-dev @capacitor/cli
+          npm install @capacitor/core @capacitor/android @capacitor/local-notifications
+          npm install --save-dev @capacitor/cli esbuild
+
           mkdir -p www
           cp index.html www/index.html
+
+          npx esbuild native-notifications-entry.js \
+            --bundle \
+            --platform=browser \
+            --format=iife \
+            --outfile=www/native-notifications.js
+
           cat > capacitor.config.json <<'EOF'
           {
             "appId": "com.carecue.app",
@@ -44,6 +53,7 @@ jobs:
             "webDir": "www"
           }
           EOF
+
           npx cap add android
           npx cap sync android
 
