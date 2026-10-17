@@ -1,1 +1,636 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#F7FAF9">
+  <title>CareCue — Medicine Reminder</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --teal: #087F73;
+      --dark-teal: #075C55;
+      --mint: #E7F7F3;
+      --offwhite: #F7FAF9;
+      --dark-text: #172B2A;
+      --muted: #4A6B66;
+      --author-red: #D62828;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      min-height: 100%;
+      margin: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      overflow: hidden;
+      background: var(--offwhite);
+      color: var(--dark-text);
+      font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    .splash {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      max-width: 420px;
+      min-height: 100vh;
+      min-height: 100dvh;
+      margin: 0 auto;
+      padding: calc(16px + env(safe-area-inset-top)) 26px
+        calc(16px + env(safe-area-inset-bottom));
+      overflow: hidden;
+      isolation: isolate;
+      background: var(--offwhite);
+    }
+
+    /* Soft ambient background */
+    .ambient-glow {
+      position: absolute;
+      z-index: -1;
+      pointer-events: none;
+      border-radius: 50%;
+      filter: blur(30px);
+    }
+
+    .glow-top {
+      top: -145px;
+      left: 50%;
+      width: 420px;
+      height: 420px;
+      transform: translateX(-50%);
+      background: radial-gradient(
+        circle,
+        rgba(231, 247, 243, 0.98) 0%,
+        rgba(240, 250, 247, 0.7) 48%,
+        transparent 75%
+      );
+    }
+
+    .glow-bottom {
+      bottom: 50px;
+      left: 50%;
+      width: 340px;
+      height: 260px;
+      transform: translateX(-50%);
+      background: radial-gradient(
+        circle,
+        rgba(8, 127, 115, 0.06) 0%,
+        rgba(231, 247, 243, 0.4) 50%,
+        transparent 80%
+      );
+    }
+
+    /* Decorative background shapes */
+    .background-shape {
+      position: absolute;
+      z-index: -1;
+      pointer-events: none;
+      border-radius: 50%;
+      background: rgba(231, 247, 243, 0.45);
+      filter: blur(36px);
+    }
+
+    .shape-one {
+      top: 35%;
+      right: -75px;
+      width: 190px;
+      height: 190px;
+    }
+
+    .shape-two {
+      bottom: 20%;
+      left: -75px;
+      width: 180px;
+      height: 180px;
+    }
+
+    /* Decorative status header */
+    .status-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      min-height: 24px;
+      color: rgba(74, 107, 102, 0.75);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+    }
+
+    .status-icons {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .status-icons svg {
+      width: 15px;
+      height: 15px;
+      fill: currentColor;
+    }
+
+    /* Central branding */
+    .hero {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 16px 0;
+      transform: translateY(-12px);
+      text-align: center;
+    }
+
+    .logo-stage {
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: 150px;
+      height: 150px;
+      margin-bottom: 24px;
+      animation: logoEntrance 800ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .logo-halo {
+      position: absolute;
+      inset: 8px;
+      border-radius: 50%;
+      background: rgba(231, 247, 243, 0.95);
+      filter: blur(19px);
+      animation: haloPulse 4s ease-in-out infinite;
+    }
+
+    .logo-disc {
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: 128px;
+      height: 128px;
+      overflow: hidden;
+      border: 1px solid rgba(8, 127, 115, 0.08);
+      border-radius: 34px;
+      background: rgba(255, 255, 255, 0.92);
+      box-shadow:
+        0 12px 34px rgba(8, 127, 115, 0.10),
+        0 3px 9px rgba(8, 127, 115, 0.05);
+    }
+
+    .logo-image {
+      display: block;
+      width: 100%;
+      height: 100%;
+      padding: 7px;
+      object-fit: contain;
+    }
+
+    /* Fallback if the image path is incorrect */
+    .logo-fallback {
+      display: none;
+      color: var(--teal);
+      font-size: 58px;
+      font-weight: 800;
+    }
+
+    .brand-title {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 5px;
+      margin: 0;
+      color: var(--dark-text);
+      font-size: 35px;
+      font-weight: 800;
+      letter-spacing: -1.4px;
+      animation: fadeUp 700ms ease 180ms both;
+    }
+
+    .brand-cross {
+      color: var(--teal);
+      font-size: 26px;
+      line-height: 1;
+    }
+
+    .brand-cue {
+      color: var(--teal);
+    }
+
+    .brand-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+      padding: 8px 13px;
+      border: 1px solid rgba(8, 127, 115, 0.13);
+      border-radius: 999px;
+      background: rgba(231, 247, 243, 0.8);
+      color: var(--dark-teal);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.015em;
+      animation: fadeUp 700ms ease 260ms both;
+    }
+
+    .badge-dot {
+      width: 7px;
+      height: 7px;
+      flex: 0 0 7px;
+      border-radius: 50%;
+      background: var(--teal);
+    }
+
+    .tagline {
+      max-width: 280px;
+      margin: 19px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 400;
+      line-height: 1.7;
+      animation: fadeUp 700ms ease 400ms both;
+    }
+
+    /* Footer */
+    .splash-footer {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      padding-top: 16px;
+      animation: fadeUp 700ms ease 550ms both;
+    }
+
+    .loader-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 13px;
+      width: 176px;
+    }
+
+    .loader-track {
+      position: relative;
+      width: 100%;
+      height: 7px;
+      overflow: hidden;
+      border: 1px solid rgba(8, 127, 115, 0.13);
+      border-radius: 999px;
+      background: #E7F7F3;
+      box-shadow: inset 0 1px 2px rgba(7, 92, 85, 0.04);
+    }
+
+    .loader-bar {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: -45%;
+      width: 35%;
+      border-radius: inherit;
+      background: linear-gradient(
+        90deg,
+        #087F73 0%,
+        #10B981 50%,
+        #075C55 100%
+      );
+      box-shadow: 0 0 8px rgba(8, 127, 115, 0.4);
+      animation: loadingMotion 1.8s cubic-bezier(0.45, 0.05, 0.25, 1) infinite;
+    }
+
+    .loader-status {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      color: var(--teal);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
+    .loading-dots {
+      display: inline-flex;
+      gap: 4px;
+    }
+
+    .loading-dots span {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--teal);
+      animation: dotPulse 1.3s ease-in-out infinite;
+    }
+
+    .loading-dots span:nth-child(2) {
+      animation-delay: 180ms;
+    }
+
+    .loading-dots span:nth-child(3) {
+      animation-delay: 360ms;
+    }
+
+    /* Creator credit: types once and stays visible */
+    .creator-credit {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      min-height: 20px;
+      margin-top: 24px;
+      overflow: visible;
+      font-size: 11px;
+    }
+
+    .creator-line {
+      display: inline-block;
+      max-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      border-right: 1.5px solid var(--author-red);
+      animation:
+        typeOnce 1.6s steps(26, end) 500ms forwards,
+        cursorBlink 750ms step-end 4;
+    }
+
+    .creator-prefix {
+      color: #667876;
+      font-weight: 500;
+    }
+
+    .creator-name {
+      color: var(--author-red);
+      font-weight: 800;
+      letter-spacing: 0.035em;
+    }
+
+    .privacy-note {
+      margin-top: 13px;
+      color: rgba(74, 107, 102, 0.7);
+      font-size: 9px;
+      font-weight: 500;
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    .gesture-bar {
+      width: 104px;
+      height: 4px;
+      margin-top: 21px;
+      border-radius: 999px;
+      background: rgba(7, 92, 85, 0.15);
+    }
+
+    @keyframes logoEntrance {
+      from {
+        opacity: 0;
+        transform: scale(0.88) translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes haloPulse {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 0.65;
+      }
+      50% {
+        transform: scale(1.06);
+        opacity: 0.95;
+      }
+    }
+
+    @keyframes loadingMotion {
+      0% {
+        left: -45%;
+        width: 35%;
+        opacity: 0.85;
+      }
+      40% {
+        left: 15%;
+        width: 55%;
+        opacity: 1;
+      }
+      80% {
+        left: 75%;
+        width: 45%;
+        opacity: 0.95;
+      }
+      100% {
+        left: 105%;
+        width: 30%;
+        opacity: 0.8;
+      }
+    }
+
+    @keyframes dotPulse {
+      0%, 100% {
+        opacity: 0.35;
+        transform: scale(0.9);
+      }
+      50% {
+        opacity: 1;
+        transform: scale(1.1);
+      }
+    }
+
+    @keyframes typeOnce {
+      from { max-width: 0; }
+      to { max-width: 30ch; }
+    }
+
+    @keyframes cursorBlink {
+      0%, 45% { border-color: var(--author-red); }
+      50%, 100% { border-color: transparent; }
+    }
+
+    @media (max-height: 650px) {
+      .logo-stage {
+        width: 112px;
+        height: 112px;
+        margin-bottom: 15px;
+      }
+
+      .logo-disc {
+        width: 96px;
+        height: 96px;
+        border-radius: 27px;
+      }
+
+      .brand-title {
+        font-size: 30px;
+      }
+
+      .tagline {
+        margin-top: 12px;
+      }
+
+      .creator-credit {
+        margin-top: 16px;
+      }
+
+      .gesture-bar {
+        margin-top: 13px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+      }
+
+      .creator-line {
+        max-width: 30ch;
+        border-right-color: transparent;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="splash">
+
+    <div class="ambient-glow glow-top"></div>
+    <div class="ambient-glow glow-bottom"></div>
+    <div class="background-shape shape-one"></div>
+    <div class="background-shape shape-two"></div>
+
+    <!-- Decorative header, not the real Android status bar -->
+    <header class="status-header" aria-hidden="true">
+      <span>CareCue</span>
+
+      <div class="status-icons">
+        <svg viewBox="0 0 24 24">
+          <path d="M1 9c6.1-6.1 15.9-6.1 22 0L12 21 1 9z"/>
+        </svg>
+
+        <svg viewBox="0 0 24 24">
+          <path d="M2 22h20V2L2 22z"/>
+        </svg>
+
+        <svg viewBox="0 0 24 24">
+          <path d="M16 4h-2V2h-4v2H8C6.9 4 6 4.9 6 6v14c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2z"/>
+        </svg>
+      </div>
+    </header>
+
+    <!-- Main branding -->
+    <main class="hero">
+      <div class="logo-stage">
+        <div class="logo-halo"></div>
+
+        <div class="logo-disc">
+          <img
+            id="carecue-logo"
+            class="logo-image"
+            src="./assets/logo.png"
+            alt="CareCue Official Logo"
+          >
+
+          <span id="logo-fallback" class="logo-fallback" aria-hidden="true">✚</span>
+        </div>
+      </div>
+
+      <h1 class="brand-title">
+        <span class="brand-cross">✚</span>
+        <span>Care<span class="brand-cue">Cue</span></span>
+      </h1>
+
+      <div class="brand-badge">
+        <span class="badge-dot"></span>
+        <span>Medicine Reminder</span>
+      </div>
+
+      <p class="tagline">
+        A little reminder, right on time.
+      </p>
+    </main>
+
+    <!-- Loading animation and creator credit -->
+    <footer class="splash-footer">
+      <div class="loader-area">
+        <div
+          class="loader-track"
+          role="progressbar"
+          aria-label="Starting CareCue"
+        >
+          <div class="loader-bar"></div>
+        </div>
+
+        <div class="loader-status">
+          <span>Starting</span>
+
+          <span class="loading-dots" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </span>
+        </div>
+      </div>
+
+      <div class="creator-credit" aria-label="Created by MIR MD. TOUHID">
+        <span class="creator-line">
+          <span class="creator-prefix">created by </span><span class="creator-name">MIR MD. TOUHID</span>
+        </span>
+      </div>
+
+      <div class="privacy-note">
+        Your schedule is saved on this device · Private &amp; Secure
+      </div>
+
+      <div class="gesture-bar" aria-hidden="true"></div>
+    </footer>
+
+  </div>
+
+  <script>
+    // Show a fallback symbol if the local logo cannot load.
+    const logo = document.getElementById("carecue-logo");
+    const fallback = document.getElementById("logo-fallback");
+
+    logo.addEventListener("error", () => {
+      logo.style.display = "none";
+      fallback.style.display = "block";
+    });
+
+    // This file can be previewed independently.
+    // It does NOT automatically launch from the Android APK.
+    // Android/Capacitor startup configuration must be changed
+    // separately if you want this screen to appear at app launch.
+  </script>
+</body>
+  </html>
+
