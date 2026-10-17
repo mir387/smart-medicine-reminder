@@ -7,6 +7,7 @@ on:
     paths:
       - "index.html"
       - "loading.html"
+      - "auth.html"
       - "assets/**"
       - "native-notifications-entry.js"
       - ".github/workflows/android-apk.yml"
@@ -42,6 +43,7 @@ jobs:
           mkdir -p www/assets
           cp index.html www/app.html
           cp loading.html www/index.html
+          cp auth.html www/auth.html
           cp -R assets/. www/assets/
 
           npx esbuild native-notifications-entry.js \
