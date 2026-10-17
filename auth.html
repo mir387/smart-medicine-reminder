@@ -5,45 +5,48 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0f766e">
-  <title>Sign in · CareCue</title>
+  <title>CareCue — Account</title>
   <style>
     * { box-sizing: border-box; }
     body {
-      margin: 0;
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      padding: 22px;
+      margin: 0; min-height: 100vh; padding: 22px;
+      display: grid; place-items: center;
       font-family: Arial, sans-serif;
-      background: #f0fdfa;
+      background: linear-gradient(145deg, #f0fdfa, #eff6ff);
       color: #153b38;
     }
     .card {
-      width: 100%;
-      max-width: 420px;
-      padding: 28px 22px;
-      border-radius: 24px;
-      background: white;
+      width: 100%; max-width: 420px; padding: 28px 22px;
+      border-radius: 24px; background: white;
       box-shadow: 0 12px 40px #0f766e16;
     }
-    .logo { font-size: 22px; font-weight: 800; color: #0f766e; }
-    h1 { margin: 28px 0 8px; font-size: 29px; }
+    .logo { font-size: 23px; font-weight: 800; color: #0f766e; }
+    h1 { margin: 28px 0 8px; font-size: 28px; }
     .sub { color: #64748b; line-height: 1.5; margin-bottom: 24px; }
     label { display: block; margin: 16px 0 7px; font-size: 14px; font-weight: 700; }
     input {
       width: 100%; padding: 14px; border: 1px solid #cbd5e1;
-      border-radius: 12px; font-size: 16px; background: #fff;
+      border-radius: 12px; font-size: 16px; background: white;
     }
     input:focus { outline: 2px solid #99f6e4; border-color: #0f766e; }
+    input:disabled { background: #f1f5f9; color: #94a3b8; }
+    .hint { font-size: 12px; color: #64748b; line-height: 1.5; margin: 7px 0 0; }
     button {
-      width: 100%; padding: 14px; margin-top: 18px; border: 0;
-      border-radius: 12px; background: #0f766e; color: white;
-      font-size: 16px; font-weight: 700; cursor: pointer;
+      width: 100%; min-height: 48px; padding: 14px; margin-top: 18px;
+      border: 0; border-radius: 12px; background: #0f766e;
+      color: white; font-size: 16px; font-weight: 700; cursor: pointer;
     }
-    .switch { text-align: center; font-size: 14px; margin-top: 20px; }
+    .google {
+      background: white; color: #334155; border: 1px solid #cbd5e1;
+    }
+    .google span { color: #4285f4; font-size: 19px; margin-right: 8px; }
+    .or { display: flex; align-items: center; gap: 12px; margin-top: 18px; color: #94a3b8; font-size: 12px; }
+    .or::before, .or::after { content: ""; height: 1px; flex: 1; background: #e2e8f0; }
+    .switch { text-align: center; font-size: 14px; margin-top: 20px; color: #64748b; }
     .switch a { color: #0f766e; font-weight: 700; cursor: pointer; }
-    .message { font-size: 14px; line-height: 1.5; margin-top: 14px; }
+    .message { font-size: 14px; line-height: 1.5; margin-top: 14px; overflow-wrap: anywhere; }
     .note { font-size: 12px; line-height: 1.5; color: #64748b; margin-top: 20px; }
+    [hidden] { display: none !important; }
   </style>
 </head>
 <body>
@@ -54,32 +57,44 @@
 
     <form id="authForm">
       <div id="nameField">
-        <label for="name">Your name</label>
+        <label for="name">Full name *</label>
         <input id="name" name="name" type="text" autocomplete="name"
-               placeholder="Enter your name" required>
+               placeholder="Enter your full name" required>
       </div>
+
+      <label for="phone">Phone number</label>
+      <input id="phone" name="phone" type="tel" inputmode="tel"
+             autocomplete="tel" placeholder="+91 XXXXX XXXXX">
+      <p class="hint">Enter a phone number OR an email address.</p>
+
+      <div class="or"><span>OR</span></div>
 
       <label for="email">Email address</label>
       <input id="email" name="email" type="email" autocomplete="email"
-             placeholder="you@example.com" required>
+             placeholder="you@example.com">
 
-      <label for="password">Password</label>
-      <input id="password" name="password" type="password"
-             autocomplete="new-password" minlength="8"
-             placeholder="At least 8 characters" required>
+      <div id="passwordField">
+        <label for="password">Password *</label>
+        <input id="password" name="password" type="password"
+               autocomplete="new-password" minlength="8"
+               placeholder="At least 8 characters">
+      </div>
 
       <button id="submitButton" type="submit">Create account</button>
     </form>
+
+    <button class="google" id="googleButton" type="button">
+      <span>G</span> Continue with Google
+    </button>
 
     <p class="switch">
       <span id="switchText">Already have an account?</span>
       <a id="switchMode" href="#">Sign in</a>
     </p>
 
-    <p class="message" id="message" role="status"></p>
-    <p class="note">
-      Account sign-in will be activated after we connect the authentication service.
-      This screen does not send or save your password.
+    <p class="message" id="message" role="status" aria-live="polite"></p>
+    <p class="note" id="note">
+      Demo screen only. Account creation and sign-in are not connected yet.
     </p>
   </main>
 
@@ -87,23 +102,70 @@
     const form = document.getElementById("authForm");
     const nameField = document.getElementById("nameField");
     const nameInput = document.getElementById("name");
+    const phoneInput = document.getElementById("phone");
     const emailInput = document.getElementById("email");
     const passwordInput = document.getElementById("password");
+    const passwordField = document.getElementById("passwordField");
     const heading = document.getElementById("heading");
     const subtitle = document.getElementById("subtitle");
     const submitButton = document.getElementById("submitButton");
     const switchText = document.getElementById("switchText");
     const switchMode = document.getElementById("switchMode");
+    const googleButton = document.getElementById("googleButton");
     const message = document.getElementById("message");
 
     let isSignup = true;
 
-    switchMode.addEventListener("click", function (event) {
+    function showMessage(text, error = false) {
+      message.textContent = text;
+      message.style.color = error ? "#b91c1c" : "#0f766e";
+    }
+
+    function updateContactFields(changedField) {
+      if (changedField === phoneInput && phoneInput.value.trim()) {
+        emailInput.value = "";
+        emailInput.disabled = true;
+      } else if (changedField === emailInput && emailInput.value.trim()) {
+        phoneInput.value = "";
+        phoneInput.disabled = true;
+      } else {
+        phoneInput.disabled = false;
+        emailInput.disabled = false;
+      }
+
+      updatePasswordVisibility();
+    }
+
+    function updatePasswordVisibility() {
+      const emailChosen = Boolean(emailInput.value.trim());
+      const phoneChosen = Boolean(phoneInput.value.trim());
+
+      passwordField.hidden = !emailChosen;
+      passwordInput.required = emailChosen;
+      passwordInput.autocomplete =
+        isSignup ? "new-password" : "current-password";
+
+      if (phoneChosen) {
+        passwordField.hidden = true;
+        passwordInput.required = false;
+        passwordInput.value = "";
+      }
+    }
+
+    phoneInput.addEventListener("input", () => {
+      updateContactFields(phoneInput);
+    });
+
+    emailInput.addEventListener("input", () => {
+      updateContactFields(emailInput);
+    });
+
+    switchMode.addEventListener("click", event => {
       event.preventDefault();
       isSignup = !isSignup;
+
       nameField.hidden = !isSignup;
       nameInput.required = isSignup;
-      passwordInput.autocomplete = isSignup ? "new-password" : "current-password";
       heading.textContent = isSignup ? "Create your account" : "Welcome back";
       subtitle.textContent = isSignup
         ? "Your medicine schedule, organised in one place."
@@ -113,15 +175,60 @@
         ? "Already have an account?"
         : "New to CareCue?";
       switchMode.textContent = isSignup ? "Sign in" : "Create account";
-      message.textContent = "";
+
+      passwordInput.value = "";
+      showMessage("");
+      updatePasswordVisibility();
     });
 
-    form.addEventListener("submit", function (event) {
+    form.addEventListener("submit", event => {
       event.preventDefault();
-      message.textContent =
-        "The screen is ready. Sign-in will work after we connect the authentication service.";
+
+      const name = nameInput.value.trim();
+      const phone = phoneInput.value.trim();
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+
+      if (isSignup && !name) {
+        showMessage("Please enter your full name.", true);
+        nameInput.focus();
+        return;
+      }
+
+      if (!phone && !email) {
+        showMessage("Enter your phone number or email address.", true);
+        return;
+      }
+
+      if (email && !emailInput.validity.valid) {
+        showMessage("Please enter a valid email address.", true);
+        return;
+      }
+
+      if (email && password.length < 8) {
+        showMessage("Password must be at least 8 characters.", true);
+        passwordInput.focus();
+        return;
+      }
+
+      if (isSignup) {
+        showMessage(
+          "Demo only: your details have not been saved and no account was created."
+        );
+      } else {
+        showMessage(
+          "Demo only: account details cannot be verified until sign-in is connected."
+        );
+      }
     });
+
+    googleButton.addEventListener("click", () => {
+      showMessage(
+        "Google sign-in will be available after we connect authentication."
+      );
+    });
+
+    updatePasswordVisibility();
   </script>
 </body>
 </html>
-
