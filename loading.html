@@ -626,11 +626,24 @@
       fallback.style.display = "block";
     });
 
-    // This file can be previewed independently.
-    // It does NOT automatically launch from the Android APK.
-    // Android/Capacitor startup configuration must be changed
-    // separately if you want this screen to appear at app launch.
+    
+    // Show a fallback symbol if the local logo cannot load.
+    const logo = document.getElementById("carecue-logo");
+    const fallback = document.getElementById("logo-fallback");
+
+    logo.addEventListener("error", () => {
+      logo.style.display = "none";
+      fallback.style.display = "block";
+    });
+
+    // Open the main CareCue app after the loading animation.
+    window.addEventListener("load", () => {
+      setTimeout(() => {
+        window.location.replace("./app.html");
+      }, 3500);
+    });
   </script>
 </body>
-  </html>
+</html>
+
 
