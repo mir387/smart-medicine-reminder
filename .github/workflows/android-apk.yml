@@ -6,6 +6,8 @@ on:
   push:
     paths:
       - "index.html"
+      - "loading.html"
+      - "assets/**"
       - "native-notifications-entry.js"
       - ".github/workflows/android-apk.yml"
 
@@ -37,8 +39,10 @@ jobs:
           npm install @capacitor/core @capacitor/android @capacitor/local-notifications
           npm install --save-dev @capacitor/cli esbuild
 
-          mkdir -p www
-          cp index.html www/index.html
+          mkdir -p www/assets
+          cp index.html www/app.html
+          cp loading.html www/index.html
+          cp -R assets/. www/assets/
 
           npx esbuild native-notifications-entry.js \
             --bundle \
@@ -69,4 +73,5 @@ jobs:
           name: CareCue-debug-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
+          
           
