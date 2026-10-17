@@ -1,1 +1,127 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0f766e">
+  <title>Sign in · CareCue</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 22px;
+      font-family: Arial, sans-serif;
+      background: #f0fdfa;
+      color: #153b38;
+    }
+    .card {
+      width: 100%;
+      max-width: 420px;
+      padding: 28px 22px;
+      border-radius: 24px;
+      background: white;
+      box-shadow: 0 12px 40px #0f766e16;
+    }
+    .logo { font-size: 22px; font-weight: 800; color: #0f766e; }
+    h1 { margin: 28px 0 8px; font-size: 29px; }
+    .sub { color: #64748b; line-height: 1.5; margin-bottom: 24px; }
+    label { display: block; margin: 16px 0 7px; font-size: 14px; font-weight: 700; }
+    input {
+      width: 100%; padding: 14px; border: 1px solid #cbd5e1;
+      border-radius: 12px; font-size: 16px; background: #fff;
+    }
+    input:focus { outline: 2px solid #99f6e4; border-color: #0f766e; }
+    button {
+      width: 100%; padding: 14px; margin-top: 18px; border: 0;
+      border-radius: 12px; background: #0f766e; color: white;
+      font-size: 16px; font-weight: 700; cursor: pointer;
+    }
+    .switch { text-align: center; font-size: 14px; margin-top: 20px; }
+    .switch a { color: #0f766e; font-weight: 700; cursor: pointer; }
+    .message { font-size: 14px; line-height: 1.5; margin-top: 14px; }
+    .note { font-size: 12px; line-height: 1.5; color: #64748b; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <div class="logo">✚ CareCue</div>
+    <h1 id="heading">Create your account</h1>
+    <p class="sub" id="subtitle">Your medicine schedule, organised in one place.</p>
+
+    <form id="authForm">
+      <div id="nameField">
+        <label for="name">Your name</label>
+        <input id="name" name="name" type="text" autocomplete="name"
+               placeholder="Enter your name" required>
+      </div>
+
+      <label for="email">Email address</label>
+      <input id="email" name="email" type="email" autocomplete="email"
+             placeholder="you@example.com" required>
+
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password"
+             autocomplete="new-password" minlength="8"
+             placeholder="At least 8 characters" required>
+
+      <button id="submitButton" type="submit">Create account</button>
+    </form>
+
+    <p class="switch">
+      <span id="switchText">Already have an account?</span>
+      <a id="switchMode" href="#">Sign in</a>
+    </p>
+
+    <p class="message" id="message" role="status"></p>
+    <p class="note">
+      Account sign-in will be activated after we connect the authentication service.
+      This screen does not send or save your password.
+    </p>
+  </main>
+
+  <script>
+    const form = document.getElementById("authForm");
+    const nameField = document.getElementById("nameField");
+    const nameInput = document.getElementById("name");
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+    const heading = document.getElementById("heading");
+    const subtitle = document.getElementById("subtitle");
+    const submitButton = document.getElementById("submitButton");
+    const switchText = document.getElementById("switchText");
+    const switchMode = document.getElementById("switchMode");
+    const message = document.getElementById("message");
+
+    let isSignup = true;
+
+    switchMode.addEventListener("click", function (event) {
+      event.preventDefault();
+      isSignup = !isSignup;
+      nameField.hidden = !isSignup;
+      nameInput.required = isSignup;
+      passwordInput.autocomplete = isSignup ? "new-password" : "current-password";
+      heading.textContent = isSignup ? "Create your account" : "Welcome back";
+      subtitle.textContent = isSignup
+        ? "Your medicine schedule, organised in one place."
+        : "Sign in to continue to CareCue.";
+      submitButton.textContent = isSignup ? "Create account" : "Sign in";
+      switchText.textContent = isSignup
+        ? "Already have an account?"
+        : "New to CareCue?";
+      switchMode.textContent = isSignup ? "Sign in" : "Create account";
+      message.textContent = "";
+    });
+
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+      message.textContent =
+        "The screen is ready. Sign-in will work after we connect the authentication service.";
+    });
+  </script>
+</body>
+</html>
+
