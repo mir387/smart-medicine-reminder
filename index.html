@@ -1,514 +1,1639 @@
 
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#087f73">
-<meta name="description" content="CareCue helps organise your prescribed medicine reminder schedule.">
-<title>CareCue — Medicine Reminder</title>
+  <!-- CareCue: Medicine Reminder App
+       Part 1/4: HTML setup, styles and header
+       Keep all four parts in the same index.html file. -->
 
-<style>
-:root {
-  --t:#087f73; --d:#075c55; --mint:#e7f7f3;
-  --ink:#172b2a; --muted:#667876; --line:#e1eae8;
-  --bg:#f5f9f8; --glow-emerald:#5eead4;
-  --glow-blue:#93c5fd; --glow-violet:#c4b5fd;
-  --glow-aqua:#99f6e4;
-}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{
-  margin:0;min-height:100vh;position:relative;isolation:isolate;
-  background:var(--bg);color:var(--ink);
-  font:16px/1.45 system-ui,-apple-system,BlinkMacSystemFont,sans-serif
-}
-body::before{
-  content:"";position:fixed;inset:-100px;z-index:-1;pointer-events:none;
-  background:
-    radial-gradient(ellipse at 12% 8%,rgba(94,234,212,.48),transparent 34%),
-    radial-gradient(ellipse at 88% 14%,rgba(147,197,253,.40),transparent 32%),
-    radial-gradient(ellipse at 82% 65%,rgba(196,181,253,.32),transparent 34%),
-    radial-gradient(ellipse at 14% 82%,rgba(153,246,228,.35),transparent 32%),
-    linear-gradient(145deg,#f3fffc 0%,#f5f8ff 52%,#faf7ff 100%);
-  filter:saturate(1.08)
-}
-.app{width:100%;max-width:740px;margin:0 auto;padding:0 16px 36px}
-.hero{
-  position:relative;margin:0 -16px 18px;padding:24px 20px 26px;
-  overflow:hidden;color:#fff;border:1px solid rgba(255,255,255,.20);
-  border-radius:0 0 28px 28px;
-  background:radial-gradient(ellipse at 92% 0%,rgba(119,255,220,.22),transparent 40%),
-  linear-gradient(135deg,#087f73 0%,#096c67 55%,#0b625e 100%);
-  box-shadow:0 15px 35px rgba(7,92,85,.17)
-}
-.hero::after{
-  content:"";position:absolute;width:170px;height:170px;right:-70px;bottom:-105px;
-  border-radius:50%;border:1px solid rgba(255,255,255,.18);
-  box-shadow:0 0 0 18px rgba(255,255,255,.035),0 0 0 38px rgba(255,255,255,.025);
-  pointer-events:none
-}
-.hero-top{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:12px}
-.brand{min-width:0;font-weight:800;letter-spacing:-.35px;overflow-wrap:anywhere}
-.account-button{
-  width:44px;height:44px;min-width:44px;display:inline-flex;align-items:center;
-  justify-content:center;flex-shrink:0;border-radius:15px;
-  background:rgba(255,255,255,.15);color:#fff;
-  border:1px solid rgba(255,255,255,.34);text-decoration:none;cursor:pointer;
-  transition:background .2s ease,transform .2s ease
-}
-.account-button:hover{background:rgba(255,255,255,.26);transform:translateY(-1px)}
-.account-button:focus-visible,button:focus-visible,a:focus-visible{
-  outline:3px solid #8cebd7;outline-offset:3px
-}
-.hero h1{position:relative;z-index:1;font-size:clamp(26px,6vw,31px);line-height:1.12;letter-spacing:-.75px;margin:25px 0 9px}
-.hero p{position:relative;z-index:1;margin:0;font-size:14px;opacity:.93;max-width:440px}
-.privacy{position:relative;z-index:1;font-size:12px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.15);padding:10px 12px;border-radius:12px;margin-top:16px;backdrop-filter:blur(8px)}
-.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
-.stat,.panel,.item{background:rgba(255,255,255,.96);border:1px solid var(--line);border-radius:16px;padding:14px}
-.stat{box-shadow:0 5px 16px rgba(24,59,54,.035);transition:transform .2s ease,box-shadow .2s ease}
-.stat:hover{transform:translateY(-2px);box-shadow:0 9px 22px rgba(24,59,54,.07)}
-.stat strong{display:block;font-size:clamp(19px,5vw,24px);letter-spacing:-.6px;color:var(--t)}
-.stat span,.sub,.small{font-size:12px;color:var(--muted)}
-.head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:22px 0 10px}
-.head h2{font-size:19px;letter-spacing:-.35px;margin:0}
-.btn{border:1px solid transparent;border-radius:11px;padding:10px 13px;font:inherit;font-size:13px;font-weight:700;background:var(--mint);color:var(--d);cursor:pointer;transition:transform .18s ease,box-shadow .18s ease,background .18s ease}
-.btn:hover{transform:translateY(-1px)}
-.btn:active{transform:translateY(0)}
-.btn:disabled{opacity:.65;cursor:wait;transform:none}
-.primary{background:linear-gradient(135deg,#0b8c7d,#08756c);color:#fff;box-shadow:0 5px 13px rgba(8,127,115,.17)}
-.primary:hover{box-shadow:0 8px 19px rgba(8,127,115,.24)}
-.quiet{background:#f0f5f4;color:var(--ink);border-color:#e5eeeb}
-.danger{background:#fff0ef;color:#a83c37;border-color:#f8dedd}
-.full{width:100%}
-.item{display:flex;gap:10px;align-items:flex-start;margin-bottom:9px;box-shadow:0 4px 13px rgba(24,59,54,.025)}
-.time{font-weight:800;color:var(--t);min-width:58px}
-.grow{flex:1;min-width:0;overflow-wrap:anywhere}
-.grow strong{display:block}
-.grow small{display:block;color:var(--muted);font-size:12px}
-.tag{display:inline-block;font-size:11px;font-weight:700;background:#e7f7f3;color:var(--d);border-radius:20px;padding:4px 8px;margin-top:6px}
-.tag.done{background:#e6f4e8;color:#286b38}
-.actions{display:flex;flex-direction:column;gap:5px}
-.mini{border:1px solid #e7efec;border-radius:8px;padding:7px 9px;font:inherit;font-size:11px;font-weight:700;background:#f3f8f6;color:var(--d);cursor:pointer}
-.mini:hover{background:#e5f5ef}
-.mini.danger{background:#fff0ef;color:#a83c37}
-.empty{text-align:center;padding:22px 10px;border:1px dashed #c8d8d5;border-radius:15px;background:rgba(255,255,255,.62);color:var(--muted);font-size:13px}
-.empty b{display:block;color:var(--ink);margin-bottom:3px}
-.field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
-.field label{font-size:13px;font-weight:700}
-.field input{width:100%;min-width:0;padding:12px;border:1px solid #d4e1de;border-radius:11px;background:#fbfdfc;color:var(--ink);font:inherit;outline:none;transition:border-color .18s ease,box-shadow .18s ease,background .18s ease}
-.field input:focus{border-color:#32a99a;background:#fff;box-shadow:0 0 0 3px rgba(8,127,115,.10)}
-#form{
-  position:relative;isolation:isolate;border:1px solid transparent;border-radius:19px;padding:17px;
-  background:linear-gradient(#fff,#fff) padding-box,
-  linear-gradient(130deg,#48d9bd 0%,#82b8ff 43%,#c3a4ff 72%,#7de7d3 100%) border-box;
-  box-shadow:0 12px 28px rgba(24,59,54,.075),0 3px 9px rgba(24,59,54,.035)
-}
-#form::before{content:"";position:absolute;z-index:-1;inset:-7px;border-radius:24px;background:linear-gradient(125deg,rgba(72,217,189,.42),rgba(130,184,255,.32),rgba(195,164,255,.36));filter:blur(17px);opacity:.55;pointer-events:none}
-#form .small{line-height:1.55}
-.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
-.row{display:flex;gap:8px}
-.row>*{flex:1;min-width:0}
-.notice{margin-top:18px;padding:12px;background:rgba(255,242,223,.94);border:1px solid #f4e5c9;border-radius:12px;color:#765018;font-size:12px}
-.foot{text-align:center;color:var(--muted);font-size:11px;margin:18px 0}
-.hidden{display:none!important}
-.history{padding:10px 0;border-bottom:1px solid var(--line);font-size:13px}
-.history:last-child{border:0}
-.status{margin-top:10px;padding:10px 12px;border-radius:10px;font-size:12px;background:#e7f7f3;color:#075c55}
-@media(min-width:600px){
-  .app{padding-left:22px;padding-right:22px;padding-top:18px}
-  .hero{margin-left:-22px;margin-right:-22px;padding:28px;border-radius:26px}
-  .hero h1{margin-top:28px}
-  #form{padding:20px}
-}
-@media(max-width:380px){
-  .app{padding-left:12px;padding-right:12px}
-  .hero{margin-left:-12px;margin-right:-12px;padding:21px 15px 23px}
-  .stats{gap:6px}.stat{padding:10px 8px}.stat span{font-size:10px}
-  .head h2{font-size:17px}.btn{padding:9px 10px;font-size:12px}
-  .grid{gap:8px}#form{padding:13px}
-  .item{gap:7px}.time{min-width:49px}
-}
-@media(prefers-reduced-motion:reduce){
-  *,*::before,*::after{scroll-behavior:auto!important;animation:none!important;transition:none!important}
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#087f73">
+  <meta name="description"
+        content="CareCue helps organise your prescribed medicine reminder schedule.">
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <title>CareCue — Medicine Reminder</title>
+
+  <!-- Supabase JavaScript client for secure user-specific data access -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Existing native notification integration -->
+  <script src="./native-notifications.js"></script>
+
+  <style>
+    /* ==========================================
+       CARECUE DESIGN SYSTEM
+       Main colour: clinical emerald
+       Layout: responsive and mobile-first
+       ========================================== */
+
+    :root {
+      --primary: #087f73;
+      --primary-dark: #06665d;
+      --primary-light: #dff7f2;
+      --ink: #16332f;
+      --muted: #6c817d;
+      --background: #f4f8f7;
+      --white: #ffffff;
+      --border: #e3ece9;
+      --danger: #c03945;
+      --warning: #fff4d6;
+      --shadow: 0 8px 28px rgba(22, 75, 66, 0.07);
+      --radius: 20px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top right, #e0f7f0 0, transparent 34%),
+        var(--background);
+      color: var(--ink);
+      min-height: 100vh;
+    }
+
+    button, input, select, textarea {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .app-shell {
+      width: min(100%, 760px);
+      margin: 0 auto;
+      padding: 18px 16px 40px;
+    }
+
+    /* Header and CareCue branding */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+    }
+
+    .brand-logo {
+      width: 48px;
+      height: 48px;
+      display: grid;
+      place-items: center;
+      color: white;
+      background: linear-gradient(145deg, #0a9b89, #05645c);
+      border-radius: 16px;
+      font-size: 24px;
+      font-weight: 800;
+      box-shadow: 0 7px 16px #087f7330;
+    }
+
+    .brand h1 {
+      font-size: 22px;
+      line-height: 1.1;
+      margin: 0;
+      letter-spacing: -0.6px;
+    }
+
+    .brand p {
+      margin: 5px 0 0;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .icon-button {
+      min-width: 44px;
+      min-height: 44px;
+      border: 1px solid var(--border);
+      background: white;
+      border-radius: 14px;
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    /* Reusable cards and buttons */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 0 0 15px;
+    }
+
+    .section-heading h2 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: -0.3px;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .small {
+      font-size: 13px;
+    }
+
+    .btn {
+      min-height: 46px;
+      border: 0;
+      border-radius: 14px;
+      padding: 12px 16px;
+      font-weight: 750;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      color: white;
+      background: linear-gradient(135deg, #0a9685, #087368);
+      box-shadow: 0 6px 15px #087f7328;
+    }
+
+    .btn-secondary {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+    }
+
+    .btn-danger {
+      background: #fff0f0;
+      color: var(--danger);
+    }
+
+    .btn-outline {
+      background: white;
+      color: var(--primary-dark);
+      border: 1px solid var(--border);
+    }
+
+    .full-width {
+      width: 100%;
+    }
+
+    /* Welcome banner */
+    .hero {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #e0f8f1, #eaf3ff);
+      border: 1px solid #d9eee8;
+      border-radius: 25px;
+      padding: 23px 20px;
+      margin-bottom: 16px;
+    }
+
+    .hero h2 {
+      margin: 0 0 8px;
+      font-size: clamp(23px, 6vw, 30px);
+      letter-spacing: -0.8px;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 420px;
+      line-height: 1.55;
+      color: #4c6b65;
+    }
+
+    .hero-mark {
+      position: absolute;
+      right: 13px;
+      bottom: 2px;
+      font-size: 68px;
+      opacity: 0.14;
+      pointer-events: none;
+    }
+
+    /* Disclaimer and status messages */
+    .disclaimer {
+      background: #fff8e8;
+      color: #725a23;
+      border: 1px solid #f2e5be;
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-size: 12px;
+      line-height: 1.5;
+      margin-bottom: 18px;
+    }
+
+    .status-message {
+      display: none;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      border-radius: 12px;
+      font-size: 13px;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+
+    .status-message.show {
+      display: block;
+    }
+
+    .status-message.success {
+      background: #e4f8ec;
+      color: #17643a;
+    }
+
+    .status-message.error {
+      background: #fff0f0;
+      color: #9e2731;
+    }
+
+    .status-message.info {
+      background: #eaf4ff;
+      color: #245a88;
+    }
+
+    /* Form controls */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 15px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      min-width: 0;
+    }
+
+    .field label {
+      font-size: 13px;
+      font-weight: 750;
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      min-height: 46px;
+      border: 1px solid #dce7e3;
+      background: #fbfdfc;
+      border-radius: 12px;
+      padding: 11px 12px;
+      color: var(--ink);
+      outline: none;
+    }
+
+    .field textarea {
+      min-height: 82px;
+      resize: vertical;
+    }
+
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px #087f7318;
+    }
+
+    .time-input {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .time-input input {
+      flex: 1 1 130px;
+    }
+
+    .form-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin-top: 17px;
+    }
+
+    /* Medicine and schedule cards */
+    .medicine-list {
+      display: grid;
+      gap: 11px;
+    }
+
+    .medicine-item {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 15px;
+      background: #fcfefd;
+    }
+
+    .medicine-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .medicine-name {
+      margin: 0;
+      font-size: 16px;
+      overflow-wrap: anywhere;
+    }
+
+    .medicine-meta {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+      overflow-wrap: anywhere;
+    }
+
+    .medicine-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .medicine-actions .btn {
+      min-height: 38px;
+      padding: 8px 12px;
+      font-size: 12px;
+    }
+
+    .schedule-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 13px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .schedule-item:last-child {
+      border-bottom: 0;
+    }
+
+    .schedule-time {
+      flex: 0 0 76px;
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--primary-dark);
+    }
+
+    .schedule-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .schedule-info strong {
+      display: block;
+      overflow-wrap: anywhere;
+    }
+
+    .schedule-info span {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .empty-state {
+      padding: 20px 10px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .badge-done {
+      background: #e2f7e9;
+      color: #17643a;
+    }
+
+    /* Activity and backup controls */
+    .activity-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .activity-item {
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: #f5f9f7;
+      font-size: 12px;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+
+    .backup-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+    }
+
+    .backup-actions .btn {
+      flex: 1 1 140px;
+    }
+
+    .footer-note {
+      text-align: center;
+      padding: 12px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.6;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    @media (min-width: 540px) {
+      .app-shell {
+        padding: 24px 22px 45px;
+      }
+
+      .form-grid.two-columns {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .card {
+        padding: 22px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        transition: none !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
 </head>
 
 <body>
-<main class="app">
+  <!-- Main application container -->
+  <main class="app-shell">
 
-<header class="hero">
-  <div class="hero-top">
-    <div class="brand">
-      ✚ CareCue
-      <span style="font-weight:400;opacity:.8">· Medicine Reminder</span>
-    </div>
-    <a href="./account.html" class="account-button" aria-label="My Account" title="My Account">
-      <svg viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <circle cx="12" cy="8" r="4"></circle>
-        <path d="M4.5 21a7.5 7.5 0 0 1 15 0"></path>
-      </svg>
-    </a>
-  </div>
-  <h1>A little reminder,<br>right on time.</h1>
-  <p>Organise your prescribed schedule, one day at a time.</p>
-  <div class="privacy">🔒 Your medicine schedules are saved to your secure account. Activity history is stored on this device.</div>
-</header>
-
-<section class="stats" aria-label="Today's overview">
-  <div class="stat"><strong id="total">0</strong><span>Today's reminders</span></div>
-  <div class="stat"><strong id="done">0</strong><span>Acknowledged</span></div>
-  <div class="stat"><strong id="count">0</strong><span>Saved medicines</span></div>
-</section>
-
-<div class="head">
-  <div><h2>Today's schedule</h2><div class="sub" id="dateLabel"></div></div>
-  <button class="btn" id="notify" type="button">Enable alerts</button>
-</div>
-<div id="today"><div class="empty">Loading your schedule…</div></div>
-
-<div class="head">
-  <div><h2 id="formTitle">Add a medicine</h2><div class="sub">Enter details exactly as prescribed.</div></div>
-</div>
-
-<form class="panel" id="form">
-  <input id="editId" type="hidden">
-
-  <div class="field">
-    <label for="name">Medicine name *</label>
-    <input id="name" required maxlength="100" placeholder="Name on prescription">
-  </div>
-
-  <div class="grid">
-    <div class="field">
-      <label for="times">Reminder times *</label>
-      <input id="times" required placeholder="08:00, 20:00" autocomplete="off">
-      <span class="small">24-hour format, separated by commas</span>
-    </div>
-    <div class="field">
-      <label for="start">Start date *</label>
-      <input id="start" type="date" required>
-    </div>
-  </div>
-
-  <div class="grid">
-    <div class="field">
-      <label for="end">End date (optional)</label>
-      <input id="end" type="date">
-    </div>
-    <div class="field">
-      <label for="notes">Label / notes (optional)</label>
-      <input id="notes" maxlength="120" placeholder="Prescription label note">
-    </div>
-  </div>
-
-  <p class="small">This app only organises reminders. It does not recommend medicines or doses. Confirm schedule changes with a clinician or pharmacist.</p>
-  <div class="row">
-    <button class="btn primary" id="save" type="submit">Save schedule</button>
-    <button class="btn quiet hidden" id="cancel" type="button">Cancel edit</button>
-  </div>
-  <div id="formStatus" class="status hidden" role="status"></div>
-</form>
-
-<div class="head">
-  <div><h2>Your medicines</h2><div class="sub">Manage saved schedules.</div></div>
-</div>
-<div id="medicines"><div class="empty">Loading medicines…</div></div>
-
-<div class="head">
-  <div><h2>Recent activity</h2><div class="sub">Acknowledgements recorded on this device.</div></div>
-  <button class="btn quiet" id="export" type="button">Export backup</button>
-</div>
-<div class="panel" id="history"></div>
-
-<div class="row" style="margin-top:9px">
-  <button class="btn quiet" id="importBtn" type="button">Import backup</button>
-  <button class="btn danger" id="clear" type="button">Delete all data</button>
-  <input class="hidden" type="file" id="file" accept="application/json">
-</div>
-
-<div class="notice">
-  <b>Important:</b> Acknowledging only records your tap; it cannot confirm medicine was taken. Android may delay notifications because of battery restrictions, notification permissions or alarm settings. Do not rely on this prototype as your only medicine reminder.
-</div>
-<div class="foot">CareCue prototype · No medical advice · Follow your prescription and clinician instructions.</div>
-</main>
-
-<script src="./native-notifications.js"></script>
-
-<script>
-"use strict";
-
-const $ = id => document.getElementById(id);
-
-const SUPABASE_URL = "https://suvrmmuwvxtvghgbtnvs.supabase.co";
-const SUPABASE_KEY = "sb_publishable_WAdWbVJxrp0JKGe0qV06_A_fcPAyjsb";
-
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-const EVENTS_KEY = "carecue_events_v1";
-
-let currentUser = null;
-let data = { medicines: [], events: [] };
-let busy = false;
-
-const today = () => {
-  const d = new Date();
-  return d.getFullYear() + "-" +
-    String(d.getMonth() + 1).padStart(2, "0") + "-" +
-    String(d.getDate()).padStart(2, "0");
-};
-
-const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({
-  "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
-}[c]));
-
-const active = (m, d) => m.start <= d && (!m.end || m.end >= d);
-const key = (id, d, t) => id + "|" + d + "|" + t;
-const done = (id, d, t) =>
-  data.events.some(e => e.key === key(id, d, t) && e.kind === "ack");
-
-const fmt = s => s ? new Date(s + "T12:00:00").toLocaleDateString(undefined, {
-  day: "numeric", month: "short", year: "numeric"
-}) : "";
-
-function newId() {
-  if (crypto.randomUUID) return crypto.randomUUID();
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, c => {
-    const r = Math.random() * 16 | 0;
-    return (c === "x" ? r : (r & 3 | 8)).toString(16);
-  });
-}
-
-function showStatus(message) {
-  $("formStatus").textContent = message;
-  $("formStatus").classList.remove("hidden");
-}
-
-function hideStatus() {
-  $("formStatus").textContent = "";
-  $("formStatus").classList.add("hidden");
-}
-
-function loadEvents() {
-  try {
-    const x = JSON.parse(localStorage.getItem(EVENTS_KEY) || "[]");
-    data.events = Array.isArray(x) ? x : [];
-  } catch {
-    data.events = [];
-  }
-}
-
-function saveEvents() {
-  try {
-    localStorage.setItem(EVENTS_KEY, JSON.stringify(data.events));
-  } catch (err) {
-    console.error("Could not save activity history", err);
-  }
-}
-
-function fromDatabase(row) {
-  return {
-    id: row.id,
-    name: row.name,
-    times: Array.isArray(row.times) ? row.times : [],
-    start: row.start_date,
-    end: row.end_date || "",
-    notes: row.notes || ""
-  };
-}
-
-function toDatabase(m) {
-  return {
-    id: m.id,
-    user_id: currentUser.id,
-    name: m.name,
-    times: m.times,
-    start_date: m.start,
-    end_date: m.end || null,
-    notes: m.notes || ""
-  };
-}
-
-async function loadMedicines() {
-  const { data: rows, error } = await supabase
-    .from("medicines")
-    .select("id,user_id,name,times,start_date,end_date,notes,created_at")
-    .eq("user_id", currentUser.id)
-    .order("created_at", { ascending: true });
-
-  if (error) throw error;
-  data.medicines = (rows || []).map(fromDatabase);
-}
-
-function render() {
-  const d = today();
-  const slots = [];
-
-  $("dateLabel").textContent = new Date().toLocaleDateString(undefined, {
-    weekday: "long", day: "numeric", month: "long"
-  });
-
-  data.medicines.filter(m => active(m, d)).forEach(m => {
-    m.times.forEach(t => slots.push({ m, t, done: done(m.id, d, t) }));
-  });
-
-  slots.sort((a, b) => a.t.localeCompare(b.t));
-
-  $("total").textContent = slots.length;
-  $("done").textContent = slots.filter(s => s.done).length;
-  $("count").textContent = data.medicines.length;
-
-  $("today").innerHTML = slots.length ? slots.map(s => `
-    <article class="item">
-      <div class="time">${esc(s.t)}</div>
-      <div class="grow">
-        <strong>${esc(s.m.name)}</strong>
-        <small>${esc(s.m.notes || "Follow your prescription label")}</small>
-        <span class="tag ${s.done ? "done" : ""}">${s.done ? "Acknowledged" : "Reminder"}</span>
+    <!-- Brand header and account shortcut -->
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-logo" aria-hidden="true">C+</div>
+        <div>
+          <h1>CareCue</h1>
+          <p>Your medicine routine, organised.</p>
+        </div>
       </div>
-      <div class="actions">
-        ${s.done
-          ? `<button class="mini quiet" data-action="undo" data-id="${esc(s.m.id)}" data-time="${esc(s.t)}">Undo</button>`
-          : `<button class="mini" data-action="ack" data-id="${esc(s.m.id)}" data-time="${esc(s.t)}">Acknowledge</button>`}
+
+      <!-- Account page should exist as account.html -->
+      <button class="icon-button" id="accountButton"
+              type="button" aria-label="Open account page">
+        Account
+      </button>
+    </header>
+
+    <!-- App feedback area: messages are inserted by JavaScript -->
+    <div id="statusMessage" class="status-message"
+         role="status" aria-live="polite"></div>
+
+    <!-- Welcome banner -->
+    <section class="hero">
+      <h2>A little care, every day.</h2>
+      <p>Keep your prescribed medicine schedule organised in one place.</p>
+      <div class="hero-mark" aria-hidden="true">✚</div>
+    </section>
+
+    <!-- Important: CareCue organises reminders, not medical prescriptions -->
+    <aside class="disclaimer">
+      <strong>Health reminder:</strong>
+      Add medicines and timings exactly as advised by your healthcare
+      professional. CareCue does not prescribe medicines or replace medical
+      advice.
+    </aside>
+
+    <!-- Part 2/4 continues inside this main container. -->
+    
+    <!-- ==========================================
+         PART 2/4: DASHBOARD AND APP INTERFACE
+         All IDs below are used by Part 3 and Part 4.
+         Do not rename these IDs.
+         ========================================== -->
+
+    <!-- Dashboard summary -->
+    <section class="card">
+      <div class="section-heading">
+        <h2>Your overview</h2>
+        <span class="badge" id="todayBadge">Today</span>
       </div>
-    </article>
-  `).join("") : `
-    <div class="empty"><b>No reminders scheduled today</b>Add a medicine below to organise your schedule.</div>
-  `;
 
-  $("medicines").innerHTML = data.medicines.length ? data.medicines.map(m => `
-    <article class="item">
-      <div class="grow">
-        <strong>${esc(m.name)}</strong>
-        <small>${esc(m.times.join(" · "))} · Starts ${esc(fmt(m.start))}${m.end ? " · Ends " + esc(fmt(m.end)) : " · No end date"}</small>
-        ${m.notes ? `<small>${esc(m.notes)}</small>` : ""}
+      <p class="muted small" id="welcomeText">
+        Your medicine routine at a glance.
+      </p>
+
+      <div class="form-grid two-columns">
+        <div>
+          <p class="muted small">Active medicines</p>
+          <h2 id="activeCount">0</h2>
+        </div>
+        <div>
+          <p class="muted small">Today's reminders</p>
+          <h2 id="todayCount">0</h2>
+        </div>
       </div>
-      <div class="actions">
-        <button class="mini" data-action="edit" data-id="${esc(m.id)}">Edit</button>
-        <button class="mini danger" data-action="delete" data-id="${esc(m.id)}">Delete</button>
+    </section>
+
+    <!-- Main action: open the medicine form -->
+    <button type="button" class="btn btn-primary full-width"
+            id="showFormButton" style="margin-bottom:16px">
+      + Add a medicine
+    </button>
+
+    <!-- Medicine add/edit form -->
+    <section class="card" id="medicineFormCard" hidden>
+      <div class="section-heading">
+        <h2 id="formTitle">Add medicine</h2>
+        <span class="badge">Medicine plan</span>
       </div>
-    </article>
-  `).join("") : `
-    <div class="empty"><b>No medicines saved yet</b>Your entries will appear here.</div>
-  `;
 
-  const ev = data.events.slice()
-    .sort((a, b) => String(b.at).localeCompare(String(a.at)))
-    .slice(0, 8);
+      <p class="muted small">
+        Enter the details from your existing prescription or care plan.
+      </p>
 
-  $("history").innerHTML = ev.length ? ev.map(e => `
-    <div class="history">
-      <b>${e.kind === "ack" ? "Acknowledged" : "Acknowledgement undone"}</b>
-      · ${esc(e.name)}
-      <br><span class="small">${esc(fmt(e.day))} at ${esc(e.time)} · ${esc(e.at ? new Date(e.at).toLocaleString() : "")}</span>
-    </div>
-  `).join("") : '<span class="sub">No activity recorded yet.</span>';
-}
+      <form id="medicineForm">
+        <input type="hidden" id="medicineId">
 
-async function refresh() {
-  render();
+        <div class="form-grid">
+          <div class="field">
+            <label for="medicineName">Medicine name *</label>
+            <input id="medicineName" name="medicineName"
+                   type="text" maxlength="120"
+                   placeholder="Enter medicine name"
+                   autocomplete="off" required>
+          </div>
 
-  if (window.CareCueNotifications?.isNative) {
-    try {
-      await window.CareCueNotifications.reschedule(data.medicines, data.events);
-    } catch (err) {
-      console.error("Notification reschedule failed", err);
-    }
-  }
-}
+          <div class="field">
+            <label for="medicineTimes">Reminder times *</label>
+            <input id="medicineTimes" name="medicineTimes"
+                   type="text"
+                   placeholder="08:00, 14:00, 20:00"
+                   aria-describedby="timesHelp" required>
+            <span class="muted small" id="timesHelp">
+              Use 24-hour time, separated by commas. Example: 08:00, 20:00.
+            </span>
+          </div>
 
-function setBusy(value) {
-  busy = value;
-  $("save").disabled = value;
-  $("save").textContent = value ? "Saving…" : ($("editId").value ? "Update schedule" : "Save schedule");
-}
+          <div class="form-grid two-columns">
+            <div class="field">
+              <label for="startDate">Start date *</label>
+              <input id="startDate" name="startDate"
+                     type="date" required>
+            </div>
 
-function reset() {
-  $("form").reset();
-  $("editId").value = "";
-  $("start").value = today();
-  $("formTitle").textContent = "Add a medicine";
-  $("save").textContent = "Save schedule";
-  $("cancel").classList.add("hidden");
-  hideStatus();
-}
+            <div class="field">
+              <label for="endDate">End date (optional)</label>
+              <input id="endDate" name="endDate" type="date">
+            </div>
+          </div>
 
-function validateForm() {
-  const name = $("name").value.trim();
-  const rawTimes = $("times").value.trim();
-  const start = $("start").value;
-  const end = $("end").value;
-  const notes = $("notes").value.trim();
+          <div class="field">
+            <label for="medicineNotes">Notes (optional)</label>
+            <textarea id="medicineNotes" name="medicineNotes"
+                      maxlength="500"
+                      placeholder="Optional notes from your care plan"></textarea>
+          </div>
+        </div>
 
-  if (!name) {
-    alert("Please enter the medicine name.");
-    return null;
-  }
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary"
+                  id="saveMedicineButton">
+            Save medicine
+          </button>
 
-  const times = rawTimes.split(",").map(t => t.trim());
-  if (!rawTimes || times.some(t => !/^([01]\d|2[0-3]):[0-5]\d$/.test(t))) {
-    alert("Enter valid 24-hour times, for example 08:00, 20:00.");
-    return null;
-  }
+          <button type="button" class="btn btn-outline"
+                  id="cancelFormButton">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </section>
 
-  if (new Set(times).size !== times.length) {
-    alert("Remove duplicate reminder times.");
-    return null;
-  }
+    <!-- Today's reminder schedule -->
+    <section class="card">
+      <div class="section-heading">
+        <h2>Today's schedule</h2>
+        <span class="badge" id="scheduleDateBadge">Today</span>
+      </div>
 
-  if (!start) {
-    alert("Please choose a start date.");
-    return null;
-  }
+      <p class="muted small">
+        Check your planned reminders for today.
+      </p>
 
-  if (end && end < start) {
-    alert("End date cannot be earlier than the start date.");
-    return null;
-  }
+      <div id="todaySchedule" aria-live="polite">
+        <div class="empty-state">
+          Your schedule will appear here after your medicines load.
+        </div>
+      </div>
+    </section>
 
-  return {
-    id: $("editId").value || newId(),
-    name, times: times.sort(), start, end, notes
-  };
-}
+    <!-- All medicines belonging to the signed-in user -->
+    <section class="card">
+      <div class="section-heading">
+        <h2>My medicines</h2>
+        <span class="badge" id="medicineListCount">0 items</span>
+      </div>
 
-$("form").addEventListener("submit", async event => {
-  event.preventDefault();
-  if (busy) return;
+      <div id="medicineList" class="medicine-list">
+        <div class="empty-state">
+          Your saved medicines will appear here.
+        </div>
+      </div>
+    </section>
 
-  const medicine = validateForm();
-  if (!medicine) return;
+    <!-- Recent activity: activity entries are stored locally -->
+    <section class="card">
+      <div class="section-heading">
+        <h2>Recent activity</h2>
+        <button type="button" class="btn btn-outline"
+                id="clearActivityButton">
+          Clear
+        </button>
+      </div>
 
-  hideStatus();
-  setBusy(true);
+      <div id="activityList" class="activity-list">
+        <div class="empty-state">
+          Your recent activity will appear here.
+        </div>
+      </div>
+    </section>
 
-  try {
-    const { data: rows, error } = await supabase
-      .from("medicines")
-      .upsert(toDatabase(medicine), { onConflict: "id" })
-      .select("id,user_id,name,times,start_date,end_date,notes");
+    <!-- Backup and restore controls -->
+    <section class="card">
+      <div class="section-heading">
+        <h2>Backup & restore</h2>
+      </div>
 
-    if (error) throw error;
-    if (!rows?.[0]) throw new Error("No saved record was returned.");
+      <p class="muted small">
+        Export a copy of your medicine schedule or import a previous
+        CareCue backup. Keep backup files private.
+      </p>
 
-    const saved = fromDatabase(rows[0]);
-    const index = data.medicines.findIndex(m => m.id === saved.id);
+      <div class="backup-actions">
+        <button type="button" class="btn btn-secondary"
+                id="exportButton">
+          Export backup
+        </button>
 
-    if (index >= 0) data.medicines[index] = saved;
-    else data.medicines.push(saved);
+        <button type="button" class="btn btn-outline"
+                id="importButton">
+          Import backup
+        </button>
 
-    reset();
-    await refresh();
-    showStatus("Schedule saved to your account.");
-  } catch (err) {
-    console.error("Supabase save failed", err);
-    alert("Could not save. Check your internet connection, medicines table and RLS policies.\n\n" + (err.message || ""));
-  } finally {
-    setBusy(false);
-  }
-});
+        <input type="file" id="importFile"
+               accept=".json,application/json" hidden>
+      </div>
 
-function editMed(id) {
-  const m = da
+      <hr style="border:0;border-top:1px solid var(--border);margin:20px 0">
+
+      <p class="muted small">
+        This action permanently deletes all medicines saved to your
+        CareCue account. Export a backup first if you need one.
+      </p>
+
+      <button type="button" class="btn btn-danger full-width"
+              id="deleteAllButton">
+        Delete all my medicines
+      </button>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer-note">
+      CareCue helps organise reminders. Always follow your healthcare
+      professional's instructions.
+    </footer>
+
+    <!-- Part 3/4: Supabase and application logic comes next. -->
+    
+    <!-- ==========================================
+         PART 3/4: SUPABASE AND MEDICINE LOGIC
+         Database access is restricted to the
+         currently authenticated user.
+         ========================================== -->
+
+    <script>
+      "use strict";
+
+      // ------------------------------------------
+      // 1. SUPABASE CONFIGURATION
+      // These must match your Supabase project.
+      // The publishable/anon key is intended for
+      // frontend use; database RLS is essential.
+      // Never place a service-role key here.
+      // ------------------------------------------
+
+      const SUPABASE_URL =
+        "https://suvrmmuwvxtvghgbtnvs.supabase.co";
+
+      const SUPABASE_KEY =
+        "sb_publishable_WAdWbVJxrp0JKGe0qV06_A_fcPAyjsb";
+
+      const supabaseClient = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+      );
+
+      // ------------------------------------------
+      // 2. APP STATE AND DOM HELPERS
+      // ------------------------------------------
+
+      const $ = (id) => document.getElementById(id);
+
+      let currentUser = null;
+      let medicines = [];
+      let editingMedicineId = null;
+      let isSaving = false;
+
+      const ACTIVITY_KEY = "carecue_events_v1";
+
+      // Format dates consistently for local calendar dates.
+      function localDateString(date = new Date()) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+      }
+
+      function escapeHTML(value) {
+        return String(value ?? "").replace(/[&<>"']/g, (character) => ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;"
+        })[character]);
+      }
+
+      function showStatus(message, type = "info") {
+        const element = $("statusMessage");
+        element.textContent = message;
+        element.className = `status-message show ${type}`;
+      }
+
+      function hideStatus() {
+        $("statusMessage").className = "status-message";
+        $("statusMessage").textContent = "";
+      }
+
+      // Do not display raw database errors containing internal details.
+      function reportDatabaseError(action, error) {
+        console.error(`CareCue ${action} error:`, error);
+        showStatus(
+          `${action} failed. Check your internet connection, database table, and RLS policies.`,
+          "error"
+        );
+      }
+
+      // ------------------------------------------
+      // 3. LOCAL ACTIVITY HISTORY
+      // Activity history is separate from the cloud
+      // medicine schedule and remains on this device.
+      // ------------------------------------------
+
+      function readActivity() {
+        try {
+          const value = JSON.parse(
+            localStorage.getItem(ACTIVITY_KEY) || "[]"
+          );
+          return Array.isArray(value) ? value : [];
+        } catch {
+          return [];
+        }
+      }
+
+      function addActivity(message) {
+        const entries = readActivity();
+
+        entries.unshift({
+          message: String(message),
+          time: new Date().toISOString()
+        });
+
+        // Keep the latest 30 entries.
+        localStorage.setItem(
+          ACTIVITY_KEY,
+          JSON.stringify(entries.slice(0, 30))
+        );
+
+        renderActivity();
+      }
+
+      function renderActivity() {
+        const entries = readActivity();
+        const container = $("activityList");
+
+        if (!entries.length) {
+          container.innerHTML =
+            '<div class="empty-state">No recent activity yet.</div>';
+          return;
+        }
+
+        container.innerHTML = entries.slice(0, 8).map((entry) => {
+          const date = new Date(entry.time);
+          const validDate = !Number.isNaN(date.getTime());
+          const timeText = validDate
+            ? date.toLocaleString()
+            : "";
+
+          return `
+            <div class="activity-item">
+              <strong>${escapeHTML(entry.message)}</strong>
+              <div class="muted">${escapeHTML(timeText)}</div>
+            </div>
+          `;
+        }).join("");
+      }
+
+      // ------------------------------------------
+      // 4. MEDICINE DATA VALIDATION
+      // ------------------------------------------
+
+      function parseTimes(value) {
+        const parts = String(value || "")
+          .split(",")
+          .map((item) => item.trim())
+          .filter(Boolean);
+
+        if (!parts.length) {
+          throw new Error("Enter at least one reminder time.");
+        }
+
+        const validTime = /^([01]\d|2[0-3]):([0-5]\d)$/;
+
+        if (!parts.every((time) => validTime.test(time))) {
+          throw new Error(
+            "Use valid 24-hour times such as 08:00 or 20:30."
+          );
+        }
+
+        return [...new Set(parts)].sort();
+      }
+
+      function readFormData() {
+        const name = $("medicineName").value.trim();
+        const times = parseTimes($("medicineTimes").value);
+        const startDate = $("startDate").value;
+        const endDate = $("endDate").value || null;
+        const notes = $("medicineNotes").value.trim();
+
+        if (!name || name.length > 120) {
+          throw new Error("Enter a valid medicine name.");
+        }
+
+        if (!startDate) {
+          throw new Error("Choose a start date.");
+        }
+
+        if (endDate && endDate < startDate) {
+          throw new Error("End date cannot be before the start date.");
+        }
+
+        if (notes.length > 500) {
+          throw new Error("Notes must be 500 characters or fewer.");
+        }
+
+        return {
+          name,
+          times,
+          start_date: startDate,
+          end_date: endDate,
+          notes
+        };
+      }
+
+      // ------------------------------------------
+      // 5. LOAD MEDICINES FROM SUPABASE
+      // The user_id filter provides an additional
+      // restriction. RLS must also be enabled.
+      // ------------------------------------------
+
+      async function loadMedicines() {
+        if (!currentUser) return;
+
+        $("medicineList").innerHTML =
+          '<div class="empty-state">Loading your medicines…</div>';
+
+        const { data, error } = await supabaseClient
+          .from("medicines")
+          .select("id,user_id,name,times,start_date,end_date,notes,created_at")
+          .eq("user_id", currentUser.id)
+          .order("created_at", { ascending: false });
+
+        if (error) {
+          reportDatabaseError("Loading medicines", error);
+          return;
+        }
+
+        medicines = Array.isArray(data) ? data : [];
+        renderMedicines();
+        renderSchedule();
+        renderDashboard();
+      }
+
+      // ------------------------------------------
+      // 6. RENDER MEDICINE CARDS
+      // ------------------------------------------
+
+      function isActiveOnDate(medicine, date) {
+        return medicine.start_date <= date &&
+          (!medicine.end_date || medicine.end_date >= date);
+      }
+
+      function renderMedicines() {
+        const container = $("medicineList");
+        $("medicineListCount").textContent =
+          `${medicines.length} item${medicines.length === 1 ? "" : "s"}`;
+
+        if (!medicines.length) {
+          container.innerHTML = `
+            <div class="empty-state">
+              No medicines saved yet.<br>
+              Tap “Add a medicine” to begin.
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = medicines.map((medicine) => {
+          const times = Array.isArray(medicine.times)
+            ? medicine.times.join(", ")
+            : "";
+
+          const dates = medicine.end_date
+            ? `${medicine.start_date} – ${medicine.end_date}`
+            : `From ${medicine.start_date} · No end date set`;
+
+          return `
+            <article class="medicine-item">
+              <div class="medicine-top">
+                <div>
+                  <h3 class="medicine-name">
+                    ${escapeHTML(medicine.name)}
+                  </h3>
+                  <p class="medicine-meta">
+                    <strong>Times:</strong> ${escapeHTML(times)}<br>
+                    <strong>Dates:</strong> ${escapeHTML(dates)}
+                    ${medicine.notes ? `<br><strong>Notes:</strong> ${escapeHTML(medicine.notes)}` : ""}
+                  </p>
+                </div>
+                <span class="badge">
+                  ${isActiveOnDate(medicine, localDateString())
+                    ? "Active today" : "Outside dates"}
+                </span>
+              </div>
+
+              <div class="medicine-actions">
+                <button type="button" class="btn btn-secondary"
+                        data-action="edit"
+                        data-id="${escapeHTML(medicine.id)}">
+                  Edit
+                </button>
+                <button type="button" class="btn btn-danger"
+                        data-action="delete"
+                        data-id="${escapeHTML(medicine.id)}">
+                  Delete
+                </button>
+              </div>
+            </article>
+          `;
+        }).join("");
+      }
+
+      // ------------------------------------------
+      // 7. RENDER TODAY'S SCHEDULE
+      // This displays planned reminder times.
+      // It does not claim that a dose was taken.
+      // ------------------------------------------
+
+      function renderSchedule() {
+        const container = $("todaySchedule");
+        const today = localDateString();
+        $("scheduleDateBadge").textContent = today;
+
+        const items = [];
+
+        medicines.forEach((medicine) => {
+          if (!isActiveOnDate(medicine, today)) return;
+
+          const times = Array.isArray(medicine.times)
+            ? medicine.times : [];
+
+          times.forEach((time) => {
+            items.push({
+              name: medicine.name,
+              time,
+              id: medicine.id
+            });
+          });
+        });
+
+        items.sort((a, b) => a.time.localeCompare(b.time));
+        $("todayCount").textContent = items.length;
+
+        if (!items.length) {
+          container.innerHTML = `
+            <div class="empty-state">
+              No active reminders scheduled for today.
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = items.map((item) => `
+          <div class="schedule-item">
+            <div class="schedule-time">${escapeHTML(item.time)}</div>
+            <div class="schedule-info">
+              <strong>${escapeHTML(item.name)}</strong>
+              <span>Planned reminder</span>
+            </div>
+            <span class="badge">Scheduled</span>
+          </div>
+        `).join("");
+      }
+
+      function renderDashboard() {
+        const today = localDateString();
+        const active = medicines.filter(
+          (medicine) => isActiveOnDate(medicine, today)
+        );
+
+        $("activeCount").textContent = active.length;
+        $("todayBadge").textContent = new Date().toLocaleDateString(
+          undefined,
+          { day: "numeric", month: "short" }
+        );
+        $("welcomeText").textContent =
+          "Your saved medicine schedule, organised in one place.";
+      }
+
+      // ------------------------------------------
+      // 8. FORM OPEN, CLOSE, RESET AND EDIT
+      // ------------------------------------------
+
+      function openForm(medicine = null) {
+        editingMedicineId = medicine ? medicine.id : null;
+        $("medicineFormCard").hidden = false;
+
+        $("formTitle").textContent = medicine
+          ? "Edit medicine" : "Add medicine";
+
+        $("saveMedicineButton").textContent = medicine
+          ? "Update medicine" : "Save medicine";
+
+        $("medicineId").value = medicine ? medicine.id : "";
+
+        $("medicineName").value = medicine ? medicine.name : "";
+        $("medicineTimes").value = medicine &&
+          Array.isArray(medicine.times)
+          ? medicine.times.join(", ") : "";
+
+        $("startDate").value = medicine
+          ? medicine.start_date : localDateString();
+
+        $("endDate").value = medicine
+          ? (medicine.end_date || "") : "";
+
+        $("medicineNotes").value = medicine
+          ? (medicine.notes || "") : "";
+
+        $("medicineFormCard").scrollIntoView({
+          behavior: "smooth",
+          block: "start"
+        });
+
+        $("medicineName").focus({ preventScroll: true });
+      }
+
+      function resetForm() {
+        $("medicineForm").reset();
+        editingMedicineId = null;
+        $("medicineId").value = "";
+        $("formTitle").textContent = "Add medicine";
+        $("saveMedicineButton").textContent = "Save medicine";
+        $("startDate").value = localDateString();
+        $("medicineFormCard").hidden = true;
+        isSaving = false;
+        $("saveMedicineButton").disabled = false;
+      }
+
+      // ------------------------------------------
+      // 9. ADD OR UPDATE A MEDICINE
+      // ------------------------------------------
+
+      async function saveMedicine(event) {
+        event.preventDefault();
+
+        if (!currentUser || isSaving) return;
+
+        let formData;
+
+        try {
+          formData = readFormData();
+        } catch (error) {
+          showStatus(error.message, "error");
+          return;
+        }
+
+        isSaving = true;
+        $("saveMedicineButton").disabled = true;
+
+        try {
+          if (editingMedicineId) {
+            // Update only the medicine owned by this user.
+            const { data, error } = await supabaseClient
+              .from("medicines")
+              .update(formData)
+              .eq("id", editingMedicineId)
+              .eq("user_id", currentUser.id)
+              .select("id");
+
+            if (error) throw error;
+            if (!data || !data.length) {
+              throw new Error("No matching medicine was updated.");
+            }
+
+            addActivity("Updated a medicine schedule");
+            showStatus("Medicine updated successfully.", "success");
+          } else {
+            // user_id is assigned from the authenticated session,
+            // never from a form field supplied by the visitor.
+            const { error } = await supabaseClient
+              .from("medicines")
+              .insert({
+                ...formData,
+                user_id: currentUser.id
+              });
+
+            if (error) throw error;
+
+            addActivity("Added a medicine schedule");
+            showStatus("Medicine saved successfully.", "success");
+          }
+
+          resetForm();
+          await loadMedicines();
+
+          // Native notification setup, if available, is handled
+          // in Part 4. Database saving works independently.
+        } catch (error) {
+          console.error("CareCue save error:", error);
+          showStatus(
+            "Could not save the medicine. Check your connection and database setup.",
+            "error"
+          );
+        } finally {
+          isSaving = false;
+          $("saveMedicineButton").disabled = false;
+        }
+      }
+
+      // ------------------------------------------
+      // 10. EDIT OR DELETE A MEDICINE
+      // ------------------------------------------
+
+      async function deleteMedicine(id) {
+        if (!currentUser) return;
+
+        const medicine = medicines.find((item) => item.id === id);
+        if (!medicine) return;
+
+        const confirmed = window.confirm(
+          `Delete "${medicine.name}" from your schedule?`
+        );
+
+        if (!confirmed) return;
+
+        const { data, error } = await supabaseClient
+          .from("medicines")
+          .delete()
+          .eq("id", id)
+          .eq("user_id", currentUser.id)
+          .select("id");
+
+        if (error) {
+          reportDatabaseError("Deleting medicine", error);
+          return;
+        }
+
+        if (!data || !data.length) {
+          showStatus(
+            "The medicine was not deleted. Check your account permissions.",
+            "error"
+          );
+          return;
+        }
+
+        addActivity("Deleted a medicine schedule");
+        showStatus("Medicine deleted.", "success");
+        await loadMedicines();
+      }
+
+      // Delegate card button clicks through one listener.
+      $("medicineList").addEventListener("click", (event) => {
+        const button = event.target.closest("button[data-action]");
+        if (!button) return;
+
+        const medicine = medicines.find(
+          (item) => item.id === button.dataset.id
+        );
+
+        if (!medicine) return;
+
+        if (button.dataset.action === "edit") {
+          openForm(medicine);
+        } else if (button.dataset.action === "delete") {
+          deleteMedicine(medicine.id);
+        }
+      });
+
+      // ------------------------------------------
+      // 11. CONNECT FORM AND BUTTONS
+      // ------------------------------------------
+
+      $("medicineForm").addEventListener("submit", saveMedicine);
+
+      $("showFormButton").addEventListener("click", () => {
+        openForm();
+      });
+
+      $("cancelFormButton").addEventListener("click", resetForm);
+
+      $("accountButton").addEventListener("click", () => {
+        window.location.href = "./account.html";
+      });
+
+      $("clearActivityButton").addEventListener("click", () => {
+        if (!window.confirm("Clear the activity history on this device?")) {
+          return;
+        }
+
+        localStorage.removeItem(ACTIVITY_KEY);
+        renderActivity();
+        showStatus("Local activity history cleared.", "success");
+      });
+
+      // Set the initial date field and activity list.
+      $("startDate").value = localDateString();
+      renderActivity();
+
+     
+      // Part 4/4: Authentication, backup, and final app startup.
+      
+    
+      // ==========================================
+      // PART 4/4: AUTHENTICATION AND FINAL FEATURES
+      // ==========================================
+
+      // ------------------------------------------
+      // 12. VERIFY THE USER SESSION
+      // Only authenticated users can access their
+      // cloud medicine schedules.
+      // ------------------------------------------
+
+      async function initialiseCareCue() {
+        try {
+          if (!window.supabase) {
+            showStatus(
+              "Supabase library could not load. Check your internet connection.",
+              "error"
+            );
+            return;
+          }
+
+          const { data, error } = await supabaseClient.auth.getSession();
+
+          if (error) throw error;
+
+          const session = data?.session;
+
+          if (!session) {
+            // The auth page should handle sign-in/sign-up.
+            window.location.replace("./auth.html");
+            return;
+          }
+
+          currentUser = session.user;
+
+          if (!currentUser) {
+            window.location.replace("./auth.html");
+            return;
+          }
+
+          showStatus("Account connected. Loading your schedule…", "success");
+
+          await loadMedicines();
+
+          // Set up optional native notifications if the existing
+          // native-notifications.js exposes a supported API.
+          await setupNativeNotifications();
+
+          // Hide the temporary success message after loading.
+          window.setTimeout(() => {
+            if ($("statusMessage").textContent.startsWith("Account connected")) {
+              hideStatus();
+            }
+          }, 2500);
+
+        } catch (error) {
+          console.error("CareCue startup error:", error);
+          showStatus(
+            "Could not verify your account. Please refresh or sign in again.",
+            "error"
+          );
+        }
+      }
+
+      // Redirect to sign-in if the current session expires or is removed.
+      supabaseClient.auth.onAuthStateChange((event, session) => {
+        if (event === "SIGNED_OUT" || !session) {
+          currentUser = null;
+          window.location.replace("./auth.html");
+        }
+      });
+
+      // ------------------------------------------
+      // 13. EXPORT MEDICINE BACKUP
+      // Creates a JSON file on the user's device.
+      // ------------------------------------------
+
+      function downloadJSON(filename, data) {
+        const blob = new Blob(
+          [JSON.stringify(data, null, 2)],
+          { type: "application/json" }
+        );
+
+        const url = URL.createObjectURL(blob);
+        const anchor = document.createElement("a");
+
+        anchor.href = url;
+        anchor.download = filename;
+        document.body.appendChild(anchor);
+        anchor.click();
+        anchor.remove();
+
+        URL.revokeObjectURL(url);
+      }
+
+      $("exportButton").addEventListener("click", () => {
+        if (!currentUser) {
+          showStatus("Please sign in first.", "error");
+          return;
+        }
+
+        const backup = {
+          app: "CareCue",
+          version: 1,
+          exportedAt: new Date().toISOString(),
+          medicines: medicines.map((medicine) => ({
+            name: medicine.name,
+            times: medicine.times,
+            start_date: medicine.start_date,
+            end_date: medicine.end_date,
+            notes: medicine.notes || ""
+          }))
+        };
+
+        downloadJSON(
+          `carecue-backup-${localDateString()}.json`,
+          backup
+        );
+
+        addActivity("Exported a medicine backup");
+        showStatus("Backup exported to your device.", "success");
+      });
+
+      // ------------------------------------------
+      // 14. IMPORT A BACKUP
+      // Imported medicines belong to the currently
+      // signed-in user. Existing entries are not
+      // automatically deleted or overwritten.
+      // ------------------------------------------
+
+      $("importButton").addEventListener("click", () => {
+        $("importFile").click();
+      });
+
+      $("importFile").addEventListener("change", async (event) => {
+        const file = event.target.files?.[0];
+
+        if (!file || !currentUser) return;
+
+        try {
+          if (file.size > 2 * 1024 * 1024) {
+            throw new Error("Backup file must be smaller than 2 MB.");
+          }
+
+          const textContent = await file.text();
+          const parsed = JSON.parse(textContent);
+
+          const entries = Array.isArray(parsed)
+            ? parsed
+            : parsed.medicines;
+
+          if (!Array.isArray(entries)) {
+            throw new Error("This file does not contain a valid medicine list.");
+          }
+
+          if (entries.length > 200) {
+            throw new Error("A backup can contain at most 200 medicines.");
+          }
+
+          const records = entries.map((entry) => {
+            const name = String(entry.name || "").trim();
+            const rawTimes = Array.isArray(entry.times)
+              ? entry.times.join(", ")
+              : String(entry.times || entry.reminderTimes || "");
+
+            const times = parseTimes(rawTimes);
+
+            // Accept the app's original startDate naming too.
+            const startDate = entry.start_date || entry.startDate;
+            const endDate = entry.end_date || entry.endDate || null;
+            const notes = String(entry.notes || "").trim();
+
+            if (!name || name.length > 120) {
+              throw new Error("A backup entry has an invalid medicine name.");
+            }
+
+            if (!startDate ||
+                !/^\d{4}-\d{2}-\d{2}$/.test(startDate)) {
+              throw new Error("A backup entry has an invalid start date.");
+            }
+
+            if (endDate &&
+                (!/^\d{4}-\d{2}-\d{2}$/.test(endDate) ||
+                 endDate < startDate)) {
+              throw new Error("A backup entry has an invalid end date.");
+            }
+
+            if (notes.length > 500) {
+              throw new Error("A backup note is too long.");
+            }
+
+            return {
+              user_id: currentUser.id,
+              name,
+              times,
+              start_date: startDate,
+              end_date: endDate,
+              notes
+            };
+          });
+
+          if (!records.length) {
+            throw new Error("The backup contains no medicines.");
+          }
+
+          const confirmed = window.confirm(
+            `Import ${records.length} medicine(s) into your account? Existing medicines will remain.`
+          );
+
+          if (!confirmed) return;
+
+          const { error } = await supabaseClient
+            .from("medicines")
+            .insert(records);
+
+          if (error) throw error;
+
+          addActivity(`Imported ${records.length} medicine(s)`);
+          await loadMedicines();
+
+          showStatus(
+            `${records.length} medicine(s) imported successfully.`,
+            "success"
+          );
+
+        } catch (error) {
+          console.error("CareCue import error:", error);
+          showStatus(
+            error.message || "Could not import this backup file.",
+            "error"
+          );
+        } finally {
+          // Allow the same file to be selected again if needed.
+          event.target.value = "";
+        }
+      });
+
+      // ------------------------------------------
+      // 15. DELETE ALL MEDICINES FOR THIS USER
+      // Requires matching database RLS policies.
+      // ------------------------------------------
+
+      $("deleteAllButton").addEventListener("click", async () => {
+        if (!currentUser) return;
+
+        if (!medicines.length) {
+          showStatus("There are no medicines to delete.", "info");
+          return;
+        }
+
+        const confirmed = window.confirm(
+          `Permanently delete all ${medicines.length} medicines from your account? This cannot be undone.`
+        );
+
+        if (!confirmed) return;
+
+        const secondConfirmation = window.confirm(
+          "Confirm once more: delete every medicine in your CareCue account?"
+        );
+
+        if (!secondConfirmation) return;
+
+        const { data, error } = await supabaseClient
+          .from("medicines")
+          .delete()
+          .eq("user_id", currentUser.id)
+          .select("id");
+
+        if (error) {
+          reportDatabaseError("Deleting all medicines", error);
+          return;
+        }
+
+        addActivity(`Deleted ${data?.length || 0} medicine(s)`);
+        await loadMedicines();
+
+        showStatus("Your medicine list has been cleared.", "success");
+      });
+
+      // ------------------------------------------
+      // 16. OPTIONAL NATIVE NOTIFICATIONS
+      // No API is assumed. The existing native
+      // bridge must expose a compatible function.
+      // ------------------------------------------
+
+      async function setupNativeNotifications() {
+        const bridge = window.CareCueNotifications;
+
+        if (!bridge || typeof bridge.isNative !== "function") {
+          // Running in a regular browser: the schedule
+          // still works, but native reminders may not.
+          return;
+        }
+
+        try {
+          const nativeAvailable = await bridge.isNative();
+
+          if (!nativeAvailable) return;
+
+          // Deliberately do not call undocumented bridge
+          // methods. Wire scheduling here only after
+          // confirming the actual native bridge API.
+          console.info(
+            "CareCue native environment detected. Verify notification API before scheduling."
+          );
+
+        } catch (error) {
+          console.warn("Native notification detection failed:", error);
+        }
+      }
+
+      // ------------------------------------------
+      // 17. START THE APP
+      // ------------------------------------------
+
+      document.addEventListener("DOMContentLoaded", () => {
+        initialiseCareCue();
+      });
+
+      // End of CareCue JavaScript.
+    </script>
+  </main>
+</body>
+</html>
