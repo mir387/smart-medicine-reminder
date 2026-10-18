@@ -53,6 +53,27 @@ body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,san
  .hero{margin-left:-22px;margin-right:-22px;padding:28px}
  .app{padding-left:22px;padding-right:22px}
 }
+ 
+.account-button {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 15px;
+  background: #e6f5f1;
+  color: #0f766e;
+  border: 1px solid #d3ebe4;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.account-button:hover {
+  background: #d4eee7;
+}
+ 
 </style>
 </head>
 <body>
@@ -62,6 +83,17 @@ body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,san
  <h1>A little reminder,<br>right on time.</h1>
  <p>Organise your prescribed schedule, one day at a time.</p>
  <div class="privacy">🔒 Your schedule is saved on this device. It is not uploaded to a server.</div>
+ 
+<a href="./account.html" class="account-button"
+   aria-label="My Account" title="My Account">
+  <svg viewBox="0 0 24 24" width="23" height="23"
+       fill="none" stroke="currentColor" stroke-width="1.8"
+       stroke-linecap="round" stroke-linejoin="round"
+       aria-hidden="true">
+    <circle cx="12" cy="8" r="4"></circle>
+    <path d="M4.5 21a7.5 7.5 0 0 1 15 0"></path>
+  </svg>
+</a>
 </header>
 
 <section class="stats">
