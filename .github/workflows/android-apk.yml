@@ -8,6 +8,7 @@ on:
       - "index.html"
       - "loading.html"
       - "auth.html"
+      - "account.html"
       - "assets/**"
       - "native-notifications-entry.js"
       - "auth-native-entry.js"
@@ -45,6 +46,7 @@ jobs:
           cp index.html www/app.html
           cp loading.html www/index.html
           cp auth.html www/auth.html
+          cp account.html www/account.html
           cp -R assets/. www/assets/
 
           npx esbuild native-notifications-entry.js \
