@@ -38,7 +38,7 @@ jobs:
       - name: Prepare Capacitor project
         run: |
           npm init -y
-          npm install @capacitor/core @capacitor/android @capacitor/local-notifications @capacitor/app
+          npm install @capacitor/core @capacitor/android @capacitor/local-notifications @capacitor/app @capacitor/browser
           npm install --save-dev @capacitor/cli esbuild
 
           mkdir -p www/assets
@@ -52,6 +52,13 @@ jobs:
             --platform=browser \
             --format=iife \
             --outfile=www/native-notifications.js
+          
+          npx esbuild auth-native-entry.js \
+            --bundle \
+            --platform=browser \
+            --format=iife \
+            --outfile=www/auth-native.js
+    
 
           cat > capacitor.config.json <<'EOF'
           {
