@@ -62,33 +62,77 @@ jobs:
 
           npx cap add android
           npx cap sync android
-          
+
           python3 - <<'PY'
+          import xml.etree.ElementTree as ET
           from pathlib import Path
 
+          ET.register_namespace(
+              "android",
+              "http://schemas.android.com/apk/res/android"
+          )
+
           path = Path("android/app/src/main/AndroidManifest.xml")
-          text = path.read_text()
+          tree = ET.parse(path)
+          root = tree.getroot()
 
-          marker = '                <category android:name="android.intent.category.LAUNCHER" />'
-          if marker not in text:
-              raise SystemExit("ERROR: Launcher intent-filter marker not found.")
+          android = "{http://schemas.android.com/apk/res/android}"
+          app = root.find("application")
 
-          deep_link = '''
-                  <intent-filter>
-                      <action android:name="android.intent.action.VIEW" />
-                      <category android:name="android.intent.category.DEFAULT" />
-                      <category android:name="android.intent.category.BROWSABLE" />
-                      <data android:scheme="com.carecue.app" android:host="auth" android:path="/callback" />
-                  </intent-filter>
-          '''
+          if app is None:
+              raise SystemExit("ERROR: Android application element not found.")
 
-          if 'android:scheme="com.carecue.app"' not in text:
-              text = text.replace(marker, marker + '\n' + deep_link, 1)
-              path.write_text(text)
+          activity = next(
+              (
+                  item for item in app.findall("activity")
+                  if item.get(android + "name", "").endswith("MainActivity")
+              ),
+              None
+          )
 
-          print("CareCue deep link registration added.")
+          if activity is None:
+              raise SystemExit("ERROR: MainActivity not found.")
+
+          exists = any(
+              any(
+                  data.get(android + "scheme") == "com.carecue.app"
+                  and data.get(android + "host") == "auth"
+                  and data.get(android + "path") == "/callback"
+                  for data in intent.findall("data")
+              )
+              for intent in activity.findall("intent-filter")
+          )
+
+          if not exists:
+              intent = ET.SubElement(activity, "intent-filter")
+
+              ET.SubElement(intent, "action", {
+                  android + "name": "android.intent.action.VIEW"
+              })
+
+              ET.SubElement(intent, "category", {
+                  android + "name": "android.intent.category.DEFAULT"
+              })
+
+              ET.SubElement(intent, "category", {
+                  android + "name": "android.intent.category.BROWSABLE"
+              })
+
+              ET.SubElement(intent, "data", {
+                  android + "scheme": "com.carecue.app",
+                  android + "host": "auth",
+                  android + "path": "/callback"
+              })
+
+              tree.write(
+                  path,
+                  encoding="utf-8",
+                  xml_declaration=True
+              )
+
+          print("CareCue deep link registration verified.")
+
           PY
-          
 
       - name: Build debug APK
         run: |
@@ -102,5 +146,4 @@ jobs:
           name: CareCue-debug-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
-          
           
