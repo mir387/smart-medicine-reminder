@@ -62,6 +62,33 @@ jobs:
 
           npx cap add android
           npx cap sync android
+          
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path("android/app/src/main/AndroidManifest.xml")
+          text = path.read_text()
+
+          marker = '                <category android:name="android.intent.category.LAUNCHER" />'
+          if marker not in text:
+              raise SystemExit("ERROR: Launcher intent-filter marker not found.")
+
+          deep_link = '''
+                  <intent-filter>
+                      <action android:name="android.intent.action.VIEW" />
+                      <category android:name="android.intent.category.DEFAULT" />
+                      <category android:name="android.intent.category.BROWSABLE" />
+                      <data android:scheme="com.carecue.app" android:host="auth" android:path="/callback" />
+                  </intent-filter>
+          '''
+
+          if 'android:scheme="com.carecue.app"' not in text:
+              text = text.replace(marker, marker + '\n' + deep_link, 1)
+              path.write_text(text)
+
+          print("CareCue deep link registration added.")
+          PY
+          
 
       - name: Build debug APK
         run: |
