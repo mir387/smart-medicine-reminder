@@ -10,6 +10,7 @@ on:
       - "auth.html"
       - "assets/**"
       - "native-notifications-entry.js"
+      - "auth-native-entry.js"
       - ".github/workflows/android-apk.yml"
 
 permissions:
