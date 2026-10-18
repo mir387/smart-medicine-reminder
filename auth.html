@@ -481,8 +481,17 @@
 
           try {
             // Supabase PKCE flow exchanges the returned code for a session.
-            const { data, error } =
-              await client.auth.exchangeCodeForSession(url);
+            const callbackUrl = new URL(url);
+const authCode = callbackUrl.searchParams.get("code");
+
+if (!authCode) {
+  throw new Error(
+    "Google callback did not contain an authorization code."
+  );
+}
+
+const { data, error } =
+  await client.auth.exchangeCodeForSession(authCode);
 
             if (error) throw error;
 
