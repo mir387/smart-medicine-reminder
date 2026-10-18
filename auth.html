@@ -485,9 +485,17 @@
 const authCode = callbackUrl.searchParams.get("code");
 
 if (!authCode) {
-  throw new Error(
-    "Google callback did not contain an authorization code."
-  );
+  const queryKeys = [...callbackUrl.searchParams.keys()];
+const hashKeys = [
+  ...new URLSearchParams(callbackUrl.hash.slice(1)).keys()
+];
+
+throw new Error(
+  "Google callback missing code. Query fields: " +
+  (queryKeys.join(", ") || "none") +
+  ". Hash fields: " +
+  (hashKeys.join(", ") || "none")
+);
 }
 
 const { data, error } =
