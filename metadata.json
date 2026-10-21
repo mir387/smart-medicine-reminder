@@ -1,0 +1,8 @@
+{
+  "name": "CareCue — Smart Medicine Reminder",
+  "description": "CareCue helps organise your prescribed medicine reminder schedule with notifications, dose logging, and account sync.",
+  "permissions": [],
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

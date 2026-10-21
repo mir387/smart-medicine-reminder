@@ -304,8 +304,8 @@
     }
 
     function goHome() {
-      // Change this destination if your dashboard uses another filename.
-      window.location.href = "./index.html";
+      // Return to main medicine reminder screen
+      window.location.href = window.location.protocol === "file:" || window.location.pathname.includes("account.html") ? "./app.html" : "./index.html";
     }
 
     function setProfileDisplay(name, email) {
@@ -448,9 +448,7 @@
     $("backButton").addEventListener("click", goHome);
     $("homeButton").addEventListener("click", goHome);
 
-    $("remindersButton").addEventListener("click", () => {
-      window.location.href = "./index.html";
-    });
+    $("remindersButton").addEventListener("click", goHome);
 
     $("saveButton").addEventListener("click", saveProfile);
     $("signOutButton").addEventListener("click", signOut);

@@ -1,4 +1,3 @@
-
 name: Build CareCue Android APK
 
 on:
@@ -12,6 +11,9 @@ on:
       - "assets/**"
       - "native-notifications-entry.js"
       - "auth-native-entry.js"
+      - "src/**"
+      - "package.json"
+      - "capacitor.config.json"
       - ".github/workflows/android-apk.yml"
 
 permissions:
@@ -38,12 +40,17 @@ jobs:
 
       - name: Prepare Capacitor project
         run: |
-          npm init -y
-          npm install @capacitor/core @capacitor/android @capacitor/local-notifications @capacitor/app @capacitor/browser
-          npm install --save-dev @capacitor/cli esbuild
+          npm install
+          npm run build || true
 
           mkdir -p www/assets
-          cp index.html www/app.html
+          if [ -d "dist" ]; then
+            cp -R dist/* www/
+            cp dist/index.html www/app.html
+          else
+            cp index.html www/app.html
+          fi
+
           cp loading.html www/index.html
           cp auth.html www/auth.html
           cp account.html www/account.html
@@ -60,13 +67,19 @@ jobs:
             --platform=browser \
             --format=iife \
             --outfile=www/auth-native.js
-    
 
           cat > capacitor.config.json <<'EOF'
           {
             "appId": "com.carecue.app",
             "appName": "CareCue",
-            "webDir": "www"
+            "webDir": "www",
+            "plugins": {
+              "LocalNotifications": {
+                "smallIcon": "ic_stat_icon_config_sample",
+                "iconColor": "#087F73",
+                "sound": "beep.wav"
+              }
+            }
           }
           EOF
 
@@ -92,6 +105,54 @@ jobs:
           if app is None:
               raise SystemExit("ERROR: Android application element not found.")
 
+          # 1. Add required notification permissions for Android 13+ (POST_NOTIFICATIONS),
+          # exact alarms (Doze mode), vibration, and boot receivers
+          required_permissions = [
+              "android.permission.POST_NOTIFICATIONS",
+              "android.permission.SCHEDULE_EXACT_ALARM",
+              "android.permission.USE_EXACT_ALARM",
+              "android.permission.VIBRATE",
+              "android.permission.RECEIVE_BOOT_COMPLETED",
+              "android.permission.WAKE_LOCK"
+          ]
+
+          existing_perms = {
+              elem.get(android + "name")
+              for elem in root.findall("uses-permission")
+          }
+
+          for perm in required_permissions:
+              if perm not in existing_perms:
+                  ET.SubElement(root, "uses-permission", {
+                      android + "name": perm
+                  })
+                  print(f"Added permission: {perm}")
+
+          # 2. Add BootReceiver and notification action receivers so reminders survive reboots
+          existing_receivers = {
+              elem.get(android + "name")
+              for elem in app.findall("receiver")
+          }
+
+          boot_receiver_name = "com.capacitorjs.plugins.localnotifications.TimedNotificationPublisher$BootReceiver"
+          if boot_receiver_name not in existing_receivers:
+              receiver = ET.SubElement(app, "receiver", {
+                  android + "name": boot_receiver_name,
+                  android + "exported": "true"
+              })
+              intent = ET.SubElement(receiver, "intent-filter")
+              ET.SubElement(intent, "action", {
+                  android + "name": "android.intent.action.BOOT_COMPLETED"
+              })
+              ET.SubElement(intent, "action", {
+                  android + "name": "android.intent.action.QUICKBOOT_POWERON"
+              })
+              ET.SubElement(intent, "action", {
+                  android + "name": "com.htc.intent.action.QUICKBOOT_POWERON"
+              })
+              print("Added LocalNotifications BootReceiver")
+
+          # 3. Add OAuth deep link filter to MainActivity
           activity = next(
               (
                   item for item in app.findall("activity")
@@ -134,13 +195,13 @@ jobs:
                   android + "path": "/callback"
               })
 
-              tree.write(
-                  path,
-                  encoding="utf-8",
-                  xml_declaration=True
-              )
+          tree.write(
+              path,
+              encoding="utf-8",
+              xml_declaration=True
+          )
 
-          print("CareCue deep link registration verified.")
+          print("CareCue Android notification & deep link registration verified.")
 
           PY
 
@@ -156,4 +217,3 @@ jobs:
           name: CareCue-debug-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
-          
